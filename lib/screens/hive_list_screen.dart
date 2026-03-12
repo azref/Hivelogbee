@@ -1,15 +1,19 @@
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/hive_model.dart';
 import '../providers/hive_provider.dart';
 import '../utils/app_theme.dart';
 import '../l10n/app_localizations.dart';
-import 'hive_details_screen.dart';
 
 class HiveListScreen extends StatefulWidget {
   final String filter;
-  const HiveListScreen({super.key, required this.filter});
+  final Function(String id, String hiveNumber, bool isNucleus) onHiveTap;
+
+  const HiveListScreen({
+    super.key,
+    required this.filter,
+    required this.onHiveTap,
+  });
 
   @override
   State<HiveListScreen> createState() => _HiveListScreenState();
@@ -97,25 +101,39 @@ class _HiveListScreenState extends State<HiveListScreen> {
   }
 
   Widget _buildHiveCard(BuildContext context, HiveModel hive, AppLocalizations l10n) {
-    // هذا الكود صحيح ولا يحتاج تعديل
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       child: InkWell(
-        onTap: () => _navigateToHiveDetails(context, hive),
+        onTap: () => widget.onHiveTap(hive.id, hive.hiveNumber, hive.isNucleus),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: Text('خلية رقم: ${hive.hiveNumber}'), // مثال بسيط
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                '${hive.isNucleus ? 'طرد' : 'خلية'} رقم: ${hive.hiveNumber}',
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: AppTheme.darkBrown,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'تاريخ التركيب: ${hive.createdDate.day}/${hive.createdDate.month}/${hive.createdDate.year}',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey[600],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
   Widget _buildEmptyState(BuildContext context, AppLocalizations l10n) {
-    // هذا الكود صحيح ولا يحتاج تعديل
-    return Center(child: Text('لا توجد خلايا'));
-  }
-
-  void _navigateToHiveDetails(BuildContext context, HiveModel hive) {
-    Navigator.push(context, MaterialPageRoute(builder: (context) => HiveDetailsScreen(hiveId: hive.id)));
+    return const Center(child: Text('لا توجد خلايا'));
   }
 }

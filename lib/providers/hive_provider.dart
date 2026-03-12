@@ -103,10 +103,43 @@ class HiveProvider extends ChangeNotifier {
     }
   }
 
-  // --- دوال الإضافة والتحديث والحذف (لا تغيير) ---
-  Future<void> addHive(HiveModel hive) async { /* ... */ }
-  Future<void> updateHive(HiveModel hive) async { /* ... */ }
-  Future<void> deleteHive(String hiveId) async { /* ... */ }
+  // --- *** هذا هو الجزء الذي تم تعديله *** ---
+
+  /// إضافة خلية جديدة.
+  /// ملاحظة: الـ stream في `fetchHives` سيقوم بتحديث القائمة تلقائيًا.
+  Future<void> addHive(HiveModel hive) async {
+    try {
+      await _hiveService.addHive(hive);
+    } catch (e) {
+      _error = 'فشل في إضافة الخلية: $e';
+      notifyListeners();
+      rethrow; // إعادة رمي الخطأ لتتمكن الواجهة من التعامل معه
+    }
+  }
+
+  /// تحديث بيانات خلية موجودة.
+  Future<void> updateHive(HiveModel hive) async {
+    try {
+      await _hiveService.updateHive(hive);
+    } catch (e) {
+      _error = 'فشل في تحديث الخلية: $e';
+      notifyListeners();
+      rethrow;
+    }
+  }
+
+  /// حذف خلية.
+  Future<void> deleteHive(String hiveId) async {
+    try {
+      await _hiveService.deleteHive(hiveId);
+    } catch (e) {
+      _error = 'فشل في حذف الخلية: $e';
+      notifyListeners();
+      rethrow;
+    }
+  }
+
+  // --- *** نهاية الجزء المعدل *** ---
 
   @override
   void dispose() {

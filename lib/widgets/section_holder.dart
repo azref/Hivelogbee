@@ -31,17 +31,12 @@ class _SectionHolderState extends State<SectionHolder> {
   @override
   void initState() {
     super.initState();
-    // عند إنشاء الويدجت لأول مرة، قم بتهيئته ليبدأ من الصفحة الصحيحة.
     _initializePageController();
   }
 
   @override
   void didUpdateWidget(covariant SectionHolder oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // هذه الدالة مهمة جدًا:
-    // عندما يقوم المستخدم بالضغط على تبويب فرعي جديد في الشريط السفلي،
-    // سيتغير `activeSubSectionId` القادم من `MainScreenHolder`.
-    // هذا الشرط يكتشف التغيير ويأمر `PageController` بالانتقال إلى الصفحة الجديدة.
     if (widget.activeSubSectionId != oldWidget.activeSubSectionId) {
       _animateToPage();
     }
@@ -50,7 +45,6 @@ class _SectionHolderState extends State<SectionHolder> {
   void _initializePageController() {
     final initialPage = widget.pageOrder.indexOf(widget.activeSubSectionId);
     _pageController = PageController(
-      // تأكد من أن الفهرس صالح قبل استخدامه
       initialPage: initialPage >= 0 ? initialPage : 0,
     );
   }
@@ -58,7 +52,6 @@ class _SectionHolderState extends State<SectionHolder> {
   void _animateToPage() {
     final newIndex = widget.pageOrder.indexOf(widget.activeSubSectionId);
     if (newIndex >= 0 && _pageController.hasClients) {
-      // الانتقال إلى الصفحة الجديدة مع تأثير حركة ناعم.
       _pageController.animateToPage(
         newIndex,
         duration: const Duration(milliseconds: 300),
@@ -75,11 +68,8 @@ class _SectionHolderState extends State<SectionHolder> {
 
   @override
   Widget build(BuildContext context) {
-    // PageView هو قلب هذا الويدجت.
     return PageView(
       controller: _pageController,
-      // نمنع المستخدم من التمرير بين الصفحات بإصبعه.
-      // التحكم يتم فقط عبر شريط التنقل السفلي لضمان التناسق.
       physics: const NeverScrollableScrollPhysics(),
       children: widget.pages,
     );

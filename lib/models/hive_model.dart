@@ -78,11 +78,10 @@ class HiveModel {
   String get type => isNucleus ? 'nucleus' : 'hive';
   DateTime get lastInspectionDate => lastInspection;
 
-  // تحويل النموذج إلى Map للتوافق مع Supabase (باستخدام ISO 8601 strings للتواريخ)
+  // --- *** هذا هو الجزء الذي تم تعديله *** ---
   Map<String, dynamic> toMap() {
-    return {
-      'id': id,
-      'user_id': userId, // تم التغيير للتوافق مع اصطلاحات Supabase (snake_case)
+    final map = {
+      'user_id': userId,
       'hive_number': hiveNumber,
       'breed': breed.name,
       'created_date': createdDate.toIso8601String(),
@@ -101,9 +100,17 @@ class HiveModel {
       'parent_hive_id': parentHiveId,
       'tags': tags,
       'custom_fields': customFields,
-      // 'updated_at' تتم إدارته تلقائيًا بواسطة Supabase عادةً
     };
+
+    // لا تقم بإضافة الـ id إلى الخريطة إلا إذا كان له قيمة
+    // هذا يسمح لـ Supabase بإنشاء ID جديد عند الإضافة
+    if (id.isNotEmpty) {
+      map['id'] = id;
+    }
+
+    return map;
   }
+  // --- *** نهاية الجزء المعدل *** ---
 
   // إنشاء نموذج من Map قادم من Supabase
   factory HiveModel.fromMap(Map<String, dynamic> map) {

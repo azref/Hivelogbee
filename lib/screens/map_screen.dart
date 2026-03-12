@@ -18,7 +18,7 @@ class _MapScreenState extends State<MapScreen> {
   GoogleMapController? _mapController;
   Set<Marker> _markers = {};
   List<ApiaryCluster> _clusters = [];
-  bool _showClusters = false;
+  final bool _showClusters = false;
   WeatherData? _currentWeather;
   String _selectedFilter = 'all';
 
@@ -191,7 +191,19 @@ class _MapScreenState extends State<MapScreen> {
   }
 
   void _onHiveMarkerTapped(String hiveId) {
-    Navigator.push(context, MaterialPageRoute(builder: (context) => HiveDetailsScreen(hiveId: hiveId)));
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => HiveDetailsScreen(
+          hiveId: hiveId,
+          activeTabId: 'overview',
+          onActionSelected: (action, hive) {
+            // يمكن إضافة منطق معالجة الإجراءات هنا حسب الحاجة
+            print('Action: $action on Hive: ${hive.hiveNumber}');
+          },
+        ),
+      ),
+    );
   }
 
   void _onClusterMarkerTapped(ApiaryCluster cluster) {

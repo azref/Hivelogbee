@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
 import '../utils/app_theme.dart';
-import '../screens/settings_screen.dart'; // تم إضافة الاستيراد
+import '../screens/settings_screen.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
@@ -10,7 +10,8 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final List<Widget>? additionalActions;
   final String? shareText;
   final String? shareSubject;
-  final VoidCallback? onNotificationPressed; // معامل جديد لزر الجرس
+  final VoidCallback? onNotificationPressed;
+  final bool centerTitle;
 
   const CustomAppBar({
     super.key,
@@ -20,51 +21,29 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.additionalActions,
     this.shareText,
     this.shareSubject,
-    this.onNotificationPressed, // معامل جديد
+    this.onNotificationPressed,
+    this.centerTitle = true,
   });
 
   @override
   Widget build(BuildContext context) {
-    // --- تم التعديل: استخدام الأصفر كلون للشريط والبني للأيقونات ---
     const Color appBarColor = AppTheme.primaryYellow;
     const Color iconAndTextColor = AppTheme.darkBrown;
-    // ---------------------------------------------
 
     return AppBar(
       backgroundColor: appBarColor,
       elevation: 1.0,
-      centerTitle: true,
+      centerTitle: centerTitle,
 
+      // --- الجرس في الـ leading (الجهة اليسرى في العربية) ---
       leading: showBackButton
           ? IconButton(
         icon: const Icon(Icons.arrow_back_ios_new, color: iconAndTextColor),
         onPressed: onBackButtonPressed ?? () => Navigator.of(context).pop(),
       )
-          : null,
-      automaticallyImplyLeading: false,
-
-      title: Text(
-        title,
-        style: const TextStyle(
-          color: iconAndTextColor,
-          fontSize: 18,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-
-      actions: _buildActions(context),
-    );
-  }
-
-  List<Widget> _buildActions(BuildContext context) {
-    final allActions = <Widget>[];
-
-    // 1. الجرس الثابت مع وظيفته
-    allActions.add(
-      IconButton(
-        icon: const Icon(Icons.notifications_none_outlined, color: AppTheme.darkBrown),
+          : IconButton(
+        icon: const Icon(Icons.notifications_none_outlined, color: iconAndTextColor),
         onPressed: onNotificationPressed ?? () {
-          // وظيفة افتراضية إذا لم يتم تمرير معامل
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('لا توجد إشعارات جديدة'),
@@ -73,14 +52,32 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           );
         },
       ),
-    );
+      automaticallyImplyLeading: false,
 
-    // 2. الأيقونات الإضافية من الشاشة الحاضنة
+      // --- العنوان في المنتصف ---
+      title: Text(
+        title,
+        style: const TextStyle(
+          color: iconAndTextColor,
+          fontSize: 15,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+
+      // --- باقي الأيقونات في الـ actions (الجهة اليمنى) ---
+      actions: _buildActions(context),
+    );
+  }
+
+  List<Widget> _buildActions(BuildContext context) {
+    final allActions = <Widget>[];
+
+    // 1. الأيقونات الإضافية من الشاشة الحاضنة (الثلاث نقاط)
     if (additionalActions != null) {
       allActions.addAll(additionalActions!);
     }
 
-    // 3. أيقونة المشاركة
+    // 2. أيقونة المشاركة
     allActions.add(
       IconButton(
         icon: const Icon(Icons.share_outlined, color: AppTheme.darkBrown),
@@ -88,7 +85,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       ),
     );
 
-    // 4. أيقونة الإعدادات (تم تعديلها لتعمل)
+    // 3. أيقونة الإعدادات
     allActions.add(
       IconButton(
         icon: const Icon(Icons.settings_outlined, color: AppTheme.darkBrown),
@@ -107,7 +104,6 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     Share.share(defaultText, subject: defaultSubject);
   }
 
-  // --- تم تعديل هذه الدالة لتعمل فعلياً ---
   void _openSettings(BuildContext context) {
     Navigator.of(context).push(
       MaterialPageRoute(

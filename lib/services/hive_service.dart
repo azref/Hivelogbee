@@ -6,22 +6,32 @@ class HiveService {
   final SupabaseClient _client = Supabase.instance.client;
 
   Stream<List<HiveModel>> getHivesStream(String userId) {
-    // الصيغة الصحيحة للـ Stream في Supabase v2
     final stream = _client
         .from('hives')
         .stream(primaryKey: ['id']);
 
-    // تطبيق الفلاتر باستخدام StreamTransformer
     return stream.transform(StreamTransformer.fromHandlers(
       handleData: (List<Map<String, dynamic>> data, EventSink<List<HiveModel>> sink) {
-        final filtered = data.where((map) => map['user_id'] == userId).toList();
-        final sorted = filtered..sort((a, b) =>
-            (b['created_date'] as String).compareTo(a['created_date'] as String)
-        );
-        sink.add(sorted.map((map) => HiveModel.fromMap(map)).toList());
+        try {
+          final filtered = data.where((map) => map['user_id'] == userId).toList();
+
+          // --- ✅ الإصلاح: تحويل التاريخ إلى DateTime قبل الفرز ---
+          final sorted = filtered..sort((a, b) {
+            final dateA = DateTime.tryParse(a['created_date'] ?? '') ?? DateTime(1970);
+            final dateB = DateTime.tryParse(b['created_date'] ?? '') ?? DateTime(1970);
+            return dateB.compareTo(dateA);
+          });
+
+          sink.add(sorted.map((map) => HiveModel.fromMap(map)).toList());
+        } catch (e) {
+          // في حالة حدوث أي خطأ أثناء التحويل أو الفرز، أرسل قائمة فارغة
+          print('Error in HiveService StreamTransformer: $e');
+          sink.add([]);
+        }
       },
     ));
   }
+
 
   Stream<HiveModel?> getHiveStream(String userId, String hiveId) {
     final stream = _client
@@ -109,6 +119,7 @@ class HiveService {
       final response = await _client.from('hives').insert(hive.toMap()).select().single();
       return response['id'];
     } catch (e) {
+      print('!!!!!!!!!! SUPABASE ERROR (addHive): $e !!!!!!!!!!');
       throw Exception('فشل في إضافة الخلية: $e');
     }
   }
