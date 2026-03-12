@@ -53,6 +53,8 @@ class _MainScreenHolderState extends State<MainScreenHolder> {
   List<NavigationState> _navigationStack = [const NavigationState(sectionId: 'home')];
   NavigationState get _currentState => _navigationStack.last;
 
+  DateTime? _lastPressed;
+
   @override
   void initState() {
     super.initState();
@@ -114,10 +116,9 @@ class _MainScreenHolderState extends State<MainScreenHolder> {
       ];
     });
   }
-
   void _onSubTabTapped(String id) {
     if (id == 'home') {
-      _onMainTabTapped(_currentState.sectionId);
+      _onMainTabTapped('home');
       return;
     }
     setState(() {
@@ -193,7 +194,17 @@ class _MainScreenHolderState extends State<MainScreenHolder> {
     bool showBack = _navigationStack.length > 1;
 
     if (_currentState.detailItemId != null) {
-      title = _currentState.detailTitle ?? 'تفاصيل الخلية';
+      final hiveProvider = Provider.of<HiveProvider>(context, listen: false);
+      try {
+        final hive = hiveProvider.hives.firstWhere((h) => h.id == _currentState.detailItemId);
+        if (hive.isNucleus) {
+          title = 'طرد رقم ${hive.hiveNumber}';
+        } else {
+          title = 'خلية رقم ${hive.hiveNumber}';
+        }
+      } catch (e) {
+        title = 'تفاصيل الخلية';
+      }
     } else {
       title = _mainNavItems.firstWhere(
               (item) => item.id == _currentState.sectionId,
@@ -308,11 +319,35 @@ class _MainScreenHolderState extends State<MainScreenHolder> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: _buildCurrentAppBar(),
-      body: _buildCurrentBody(),
-      bottomNavigationBar: _buildCurrentBottomNavBar(),
-      floatingActionButton: _buildFloatingActionButton(),
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) return;
+
+        if (_currentState.sectionId == 'home' && _navigationStack.length == 1) {
+          if (_lastPressed == null ||
+              DateTime.now().difference(_lastPressed!) > const Duration(seconds: 2)) {
+            _lastPressed = DateTime.now();
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('اضغط مرتين للخروج'),
+                duration: Duration(seconds: 2),
+                backgroundColor: AppTheme.primaryYellow,
+              ),
+            );
+          } else {
+            Navigator.of(context).pop();
+          }
+        } else {
+          _navigateBack();
+        }
+      },
+      child: Scaffold(
+        appBar: _buildCurrentAppBar(),
+        body: _buildCurrentBody(),
+        bottomNavigationBar: _buildCurrentBottomNavBar(),
+        floatingActionButton: _buildFloatingActionButton(),
+      ),
     );
   }
 }
