@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/hive_model.dart';
 import '../providers/auth_provider.dart';
-import '../providers/treatment_provider.dart';
 import '../providers/hive_provider.dart';
+// --- 1. استيراد الـ Provider المفقود ---
+import '../providers/inspection_provider.dart';
+import '../providers/treatment_provider.dart';
 import '../widgets/custom_app_bar.dart';
 import '../widgets/custom_bottom_nav_bar.dart';
-import '../widgets/section_holder.dart';
 import '../utils/app_theme.dart';
 import 'home_screen.dart';
-// --- 1. استيراد الشاشات الصحيحة ---
 import 'inspection_list_screen.dart';
 import 'treatment_list_screen.dart';
 import 'hive_list_screen.dart';
@@ -64,11 +64,14 @@ class _MainScreenHolderState extends State<MainScreenHolder> {
   @override
   void initState() {
     super.initState();
+    // --- 2. تعديل initState لجلب جميع البيانات الأولية ---
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final userId = Provider.of<AuthProvider>(context, listen: false).user?.id;
       if (userId != null) {
-        Provider.of<HiveProvider>(context, listen: false).initialize(userId);
-        Provider.of<TreatmentProvider>(context, listen: false).fetchTreatments(userId);
+        // لا حاجة لاستدعاء initialize هنا، لأن ProxyProvider في main.dart يقوم بذلك
+        // Provider.of<HiveProvider>(context, listen: false).initialize(userId);
+        // Provider.of<InspectionProvider>(context, listen: false).initialize(userId);
+        // Provider.of<TreatmentProvider>(context, listen: false).fetchTreatments(userId);
       }
     });
   }
@@ -133,6 +136,7 @@ class _MainScreenHolderState extends State<MainScreenHolder> {
     });
   }
 
+  // --- 3. تعديل دالة navigateAndRefresh لتحديث جميع الـ Providers ---
   void _handleHiveAction(String action, HiveModel hive) {
     Future<void> navigateAndRefresh(Widget screen) async {
       final result = await Navigator.push(
@@ -142,7 +146,10 @@ class _MainScreenHolderState extends State<MainScreenHolder> {
       if (result == true && mounted) {
         final userId = Provider.of<AuthProvider>(context, listen: false).user?.id;
         if (userId != null) {
-          Provider.of<HiveProvider>(context, listen: false).fetchHives();
+          // تحديث كل من الخلايا والفحوصات
+          await Provider.of<HiveProvider>(context, listen: false).fetchHives();
+          await Provider.of<InspectionProvider>(context, listen: false).fetchInspections();
+          // يمكنك إضافة تحديثات أخرى هنا إذا لزم الأمر
         }
       }
     }
@@ -233,24 +240,34 @@ class _MainScreenHolderState extends State<MainScreenHolder> {
     bool showBack = _navigationStack.length > 1;
 
     if (_currentState.detailItemId != null) {
-      final hiveProvider = Provider.of<HiveProvider>(context, listen: false);
-      try {
-        final hive = hiveProvider.hives.firstWhere((h) => h.id == _currentState.detailItemId);
-        title = '${hive.isNucleus ? 'طرد' : 'خلية'} ${hive.hiveNumber}';
-      } catch (e) {
-        title = 'تفاصيل الخلية';
-      }
+      // استخدام Consumer هنا لضمان تحديث العنوان عند تغير بيانات الخلية
+      return PreferredSize(
+        preferredSize: const Size.fromHeight(kToolbarHeight),
+        child: Consumer<HiveProvider>(
+          builder: (context, hiveProvider, child) {
+            try {
+              final hive = hiveProvider.hives.firstWhere((h) => h.id == _currentState.detailItemId);
+              title = '${hive.isNucleus ? 'طرد' : 'خلية'} ${hive.hiveNumber}';
+              return _buildAppBarContent(title, showBack, hive);
+            } catch (e) {
+              title = 'تفاصيل الخلية';
+              return _buildAppBarContent(title, showBack, null);
+            }
+          },
+        ),
+      );
     } else {
       title = _mainNavItems.firstWhere(
               (item) => item.id == _currentState.sectionId,
           orElse: () => _mainNavItems.first
       ).label;
+      return _buildAppBarContent(title, showBack, null);
     }
+  }
 
+  CustomAppBar _buildAppBarContent(String title, bool showBack, HiveModel? hive) {
     List<Widget>? additionalActions;
-    if (_currentState.detailItemId != null) {
-      final hiveProvider = Provider.of<HiveProvider>(context, listen: false);
-      final hive = hiveProvider.hives.firstWhere((h) => h.id == _currentState.detailItemId);
+    if (hive != null) {
       additionalActions = [
         IconButton(
           icon: const Icon(Icons.more_vert),
@@ -258,7 +275,6 @@ class _MainScreenHolderState extends State<MainScreenHolder> {
         ),
       ];
     }
-
     return CustomAppBar(
       title: title,
       showBackButton: showBack,
@@ -268,9 +284,8 @@ class _MainScreenHolderState extends State<MainScreenHolder> {
     );
   }
 
-  // --- *** هذا هو الجزء الذي تم تعديله *** ---
+
   Widget _buildCurrentBody() {
-    // الحالة 1: عرض تفاصيل عنصر (مثل خلية)
     if (_currentState.detailItemId != null) {
       switch (_currentState.sectionId) {
         case 'hives':
@@ -282,7 +297,6 @@ class _MainScreenHolderState extends State<MainScreenHolder> {
       }
     }
 
-    // الحالة 2: عرض قسم رئيسي مع تبويبات فرعية (مثل قسم الخلايا أو الفحوصات)
     if (_currentState.sectionId != 'home' && _currentState.sectionId != 'knowledge') {
       switch (_currentState.sectionId) {
         case 'hives':
@@ -294,9 +308,8 @@ class _MainScreenHolderState extends State<MainScreenHolder> {
               detailTitle: '${isNucleus ? 'طرد' : 'خلية'} $hiveNumber',
             ));
           });
-      // 2. إضافة حالة الفحوصات
         case 'inspections':
-          return const InspectionListScreen(); // لا تحتاج فلتر لأنها الشاشة العامة
+          return const InspectionListScreen();
         case 'treatments':
           return TreatmentListScreen(filter: _currentState.subSectionId ?? 'all');
         default:
@@ -304,16 +317,13 @@ class _MainScreenHolderState extends State<MainScreenHolder> {
       }
     }
 
-    // الحالة 3: عرض الشاشة الرئيسية أو شاشة المعرفة (لا تحتوي على تبويبات فرعية)
     switch (_currentState.sectionId) {
       case 'knowledge':
-      // return const KnowledgeScreen(); // افترض أن لديك شاشة المعرفة
         return const Center(child: Text('شاشة المعرفة'));
-      default: // 'home'
+      default:
         return const HomeScreen();
     }
   }
-  // --- *** نهاية الجزء المعدل *** ---
 
   Widget _buildCurrentBottomNavBar() {
     if (_currentState.detailItemId != null) {
@@ -329,7 +339,6 @@ class _MainScreenHolderState extends State<MainScreenHolder> {
       );
     }
 
-    // لا نعرض شريط التبويبات الفرعية للأقسام التي لا تحتوي عليها
     if (_currentState.sectionId == 'hives' || _currentState.sectionId == 'treatments') {
       final items = _subNavItems[_currentState.sectionId] ?? [];
       return CustomBottomNavBar(
@@ -358,7 +367,7 @@ class _MainScreenHolderState extends State<MainScreenHolder> {
           if (result == true && mounted) {
             final userId = Provider.of<AuthProvider>(context, listen: false).user?.id;
             if (userId != null) {
-              Provider.of<HiveProvider>(context, listen: false).fetchHives();
+              await Provider.of<HiveProvider>(context, listen: false).fetchHives();
             }
           }
         },

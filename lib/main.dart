@@ -16,7 +16,6 @@ import 'providers/production_provider.dart';
 import 'services/ad_service.dart';
 import 'utils/app_theme.dart';
 import 'screens/login_screen.dart';
-// --- *** 1. استيراد الشاشة الحاضنة الجديدة *** ---
 import 'screens/main_screen_holder.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
@@ -38,14 +37,57 @@ class HiveLogBeeApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // --- *** هذا هو الجزء الذي تم تعديله بالكامل *** ---
     return MultiProvider(
       providers: [
+        // Providers مستقلة لا تعتمد على غيرها
         ChangeNotifierProvider(create: (_) => SettingsProvider()..loadSettings()),
         ChangeNotifierProvider(create: (_) => AuthProvider()),
-        ChangeNotifierProvider(create: (_) => HiveProvider()),
-        ChangeNotifierProvider(create: (_) => InspectionProvider()),
-        ChangeNotifierProvider(create: (_) => TreatmentProvider()),
-        ChangeNotifierProvider(create: (_) => ProductionProvider()),
+
+        // Providers تعتمد على AuthProvider للحصول على userId
+        ChangeNotifierProxyProvider<AuthProvider, HiveProvider>(
+          create: (_) => HiveProvider(),
+          update: (_, auth, previousHiveProvider) {
+            final userId = auth.user?.id;
+            if (userId != null) {
+              previousHiveProvider?.initialize(userId);
+            }
+            return previousHiveProvider!;
+          },
+        ),
+        ChangeNotifierProxyProvider<AuthProvider, InspectionProvider>(
+          // تم تمرير context هنا
+          create: (context) => InspectionProvider(context),
+          update: (_, auth, previousInspectionProvider) {
+            final userId = auth.user?.id;
+            if (userId != null) {
+              previousInspectionProvider?.initialize(userId);
+            }
+            return previousInspectionProvider!;
+          },
+        ),
+        ChangeNotifierProxyProvider<AuthProvider, TreatmentProvider>(
+          create: (_) => TreatmentProvider(),
+          update: (_, auth, previousTreatmentProvider) {
+            final userId = auth.user?.id;
+            if (userId != null) {
+              // افترض أن لديك دالة initialize في TreatmentProvider
+              // previousTreatmentProvider?.initialize(userId);
+            }
+            return previousTreatmentProvider!;
+          },
+        ),
+        ChangeNotifierProxyProvider<AuthProvider, ProductionProvider>(
+          create: (_) => ProductionProvider(),
+          update: (_, auth, previousProductionProvider) {
+            final userId = auth.user?.id;
+            if (userId != null) {
+              // افترض أن لديك دالة initialize في ProductionProvider
+              // previousProductionProvider?.initialize(userId);
+            }
+            return previousProductionProvider!;
+          },
+        ),
       ],
       child: Consumer<SettingsProvider>(
         builder: (context, settings, child) {
@@ -77,7 +119,6 @@ class HiveLogBeeApp extends StatelessWidget {
                 }
 
                 if (auth.isAuthenticated) {
-                  // --- *** 2. استخدام الشاشة الحاضنة كنقطة بداية *** ---
                   return const MainScreenHolder();
                 } else {
                   return const LoginScreen();
@@ -90,8 +131,3 @@ class HiveLogBeeApp extends StatelessWidget {
     );
   }
 }
-
-// هذا الـ extension لم يعد ضروريًا
-// extension on SettingsProvider {
-//   Locale? get locale => Locale(language);
-// }

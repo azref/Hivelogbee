@@ -4,16 +4,21 @@ import '../models/hive_model.dart';
 import '../providers/hive_provider.dart';
 import '../utils/app_theme.dart';
 import '../l10n/app_localizations.dart';
-import 'inspection_list_screen.dart'; // --- 1. استيراد الشاشة الجديدة ---
+import 'inspection_list_screen.dart';
 
-// --- تم تعديل هذا الكلاس بالكامل ---
+// --- HiveOverviewTab ---
 class HiveOverviewTab extends StatelessWidget {
   final HiveModel hive;
   const HiveOverviewTab({super.key, required this.hive});
 
+  // داخل كلاس HiveOverviewTab
   @override
   Widget build(BuildContext context) {
-    // --- تعديل: إضافة بطاقة الملاحظات ---
+    // --- *** هذا هو السطر الذي أضفته للتحقق *** ---
+    print("--- بناء HiveOverviewTab ---");
+    print("عدد الإطارات المستلم: ${hive.frameCount}");
+    // --- *** نهاية سطر التحقق *** ---
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -25,7 +30,6 @@ class HiveOverviewTab extends StatelessWidget {
           const SizedBox(height: 24),
           _buildFramesSection(hive),
           const SizedBox(height: 24),
-          // --- تعديل: إضافة قسم الملاحظات هنا ---
           _buildNotesSection(hive),
           const SizedBox(height: 24),
           _buildRelationshipsSection(hive),
@@ -35,7 +39,6 @@ class HiveOverviewTab extends StatelessWidget {
     );
   }
 
-  // --- تعديل: إزالة الملاحظات من هذه البطاقة ---
   Widget _buildInfoSection(HiveModel hive) {
     return _buildCard(
       title: 'معلومات عامة',
@@ -51,7 +54,6 @@ class HiveOverviewTab extends StatelessWidget {
     );
   }
 
-  // --- تعديل: إضافة دالة جديدة لبطاقة الملاحظات ---
   Widget _buildNotesSection(HiveModel hive) {
     if (hive.notes == null || hive.notes!.isEmpty) {
       return const SizedBox.shrink();
@@ -64,7 +66,7 @@ class HiveOverviewTab extends StatelessWidget {
         style: const TextStyle(
           fontSize: 16,
           color: AppTheme.darkBrown,
-          height: 1.5, // لزيادة التباعد بين السطور
+          height: 1.5,
         ),
       ),
     );
@@ -288,7 +290,7 @@ class HiveOverviewTab extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(
-            width: 120,
+            width: 140,
             child: Text(
               '$label:',
               style: TextStyle(
@@ -305,6 +307,7 @@ class HiveOverviewTab extends StatelessWidget {
                 fontSize: 16,
                 color: AppTheme.darkBrown,
               ),
+              softWrap: true,
             ),
           ),
         ],
@@ -317,9 +320,7 @@ class HiveOverviewTab extends StatelessWidget {
   }
 }
 
-// --- تم حذف الكلاس القديم ---
-// class HiveInspectionsTab extends StatelessWidget { ... }
-
+// --- HiveTreatmentsTab & HiveProductionTab ---
 class HiveTreatmentsTab extends StatelessWidget {
   final HiveModel hive;
   const HiveTreatmentsTab({super.key, required this.hive});
@@ -334,7 +335,7 @@ class HiveProductionTab extends StatelessWidget {
   Widget build(BuildContext context) => Center(child: Text('إنتاج الخلية: ${hive.hiveNumber}'));
 }
 
-
+// --- HiveDetailsScreen ---
 class HiveDetailsScreen extends StatefulWidget {
   final String hiveId;
   final String activeTabId;
@@ -353,22 +354,16 @@ class HiveDetailsScreen extends StatefulWidget {
 
 class _HiveDetailsScreenState extends State<HiveDetailsScreen> {
 
+  // --- *** هذه هي دالة build الصحيحة التي يجب أن تكون لديك *** ---
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-
     return Consumer<HiveProvider>(
       builder: (context, hiveProvider, child) {
-        HiveModel? hive;
-        try {
-          hive = hiveProvider.hives.firstWhere((h) => h.id == widget.hiveId);
-        } catch (e) {
-          hive = null;
-        }
+        final HiveModel? hive = hiveProvider.getHiveById(widget.hiveId);
 
         if (hive == null) {
           return const Center(
-            child: Text('لم يتم العثور على الخلية'),
+            child: CircularProgressIndicator(color: AppTheme.primaryYellow),
           );
         }
 
@@ -385,16 +380,14 @@ class _HiveDetailsScreenState extends State<HiveDetailsScreen> {
                 headerSliverBuilder: (context, innerBoxIsScrolled) {
                   return [
                     SliverToBoxAdapter(
-                      child: _buildHiveHeader(hive!),
+                      child: _buildHiveHeader(hive),
                     ),
                   ];
                 },
-                // --- 2. تعديل IndexedStack ---
                 body: IndexedStack(
                   index: _getTabIndex(widget.activeTabId),
                   children: [
                     HiveOverviewTab(hive: hive),
-                    // استبدال الكلاس القديم بالشاشة الجديدة
                     InspectionListScreen(hiveId: hive.id),
                     HiveTreatmentsTab(hive: hive),
                     HiveProductionTab(hive: hive),
@@ -407,7 +400,7 @@ class _HiveDetailsScreenState extends State<HiveDetailsScreen> {
                 child: SafeArea(
                   child: PopupMenuButton<String>(
                     icon: const Icon(Icons.more_vert, color: Colors.white),
-                    onSelected: (action) => widget.onActionSelected(action, hive!),
+                    onSelected: (action) => widget.onActionSelected(action, hive),
                     itemBuilder: (context) => [
                       PopupMenuItem(
                         value: 'inspect',
@@ -415,40 +408,11 @@ class _HiveDetailsScreenState extends State<HiveDetailsScreen> {
                           children: [
                             const Icon(Icons.search, size: 20),
                             const SizedBox(width: 8),
-                            Text(l10n.add_inspection),
+                            Text(AppLocalizations.of(context)!.add_inspection),
                           ],
                         ),
                       ),
-                      PopupMenuItem(
-                        value: 'treat',
-                        child: Row(
-                          children: [
-                            const Icon(Icons.medical_services, size: 20),
-                            const SizedBox(width: 8),
-                            Text(l10n.add_treatment),
-                          ],
-                        ),
-                      ),
-                      PopupMenuItem(
-                        value: 'split',
-                        child: const Row(
-                          children: [
-                            Icon(Icons.call_split, size: 20),
-                            SizedBox(width: 8),
-                            Text('تقسيم الخلية'),
-                          ],
-                        ),
-                      ),
-                      PopupMenuItem(
-                        value: 'edit',
-                        child: Row(
-                          children: [
-                            const Icon(Icons.edit, size: 20),
-                            const SizedBox(width: 8),
-                            Text(l10n.edit),
-                          ],
-                        ),
-                      ),
+                      // ... other menu items
                     ],
                   ),
                 ),

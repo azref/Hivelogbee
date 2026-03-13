@@ -1,14 +1,11 @@
-// تم حذف 'package:cloud_firestore/cloud_firestore.dart'
-
 // Enums to ensure data consistency
-// --- *** تم تعديل هذه الـ Enums لتطابق الكود المستخدم *** ---
-enum HiveHealth { strong, average, weak } // تم إرجاع average
-enum QueenPresence { present, absent, newQueen, unseen } // تم إضافة newQueen و unseen
-enum BroodPattern { good, spotty, poor, none } // تم إضافة none
+enum HiveHealth { strong, average, weak }
+enum QueenPresence { present, absent, newQueen, unseen }
+enum BroodPattern { good, spotty, poor, none }
 enum Temperament { calm, nervous, aggressive }
 enum InspectionIssue {
   varroa,
-  smallHiveBeetle, // تم التأكد من وجوده
+  smallHiveBeetle,
   waxMoth,
   americanFoulbrood,
   europeanFoulbrood,
@@ -19,9 +16,9 @@ enum InspectionIssue {
   robbing,
   pesticidePoisoning,
   other,
-  foulbrood, // تم إضافته
-  queenless, // تم إضافته
-  swarming, // تم إضافته
+  foulbrood,
+  queenless,
+  swarming,
 }
 
 class InspectionModel {
@@ -43,6 +40,8 @@ class InspectionModel {
   final double? temperature;
   final double? humidity;
   final Map<String, dynamic>? customFields;
+  // --- 1. تم تغيير اسم الحقل ---
+  final List<Map<String, dynamic>> actions;
 
   InspectionModel({
     required this.id,
@@ -63,6 +62,8 @@ class InspectionModel {
     this.temperature,
     this.humidity,
     this.customFields,
+    // --- 2. تم تغيير اسم الحقل ---
+    this.actions = const [],
   });
 
   // تحويل النموذج إلى Map للتوافق مع Supabase
@@ -86,6 +87,8 @@ class InspectionModel {
       'temperature': temperature,
       'humidity': humidity,
       'custom_fields': customFields,
+      // --- 3. تم تغيير المفتاح ---
+      'actions': actions,
     };
   }
 
@@ -99,7 +102,7 @@ class InspectionModel {
       inspectorName: map['inspector_name'],
       hiveHealth: HiveHealth.values.firstWhere(
             (e) => e.name == map['hive_health'],
-        orElse: () => HiveHealth.average, // تم التغيير إلى average
+        orElse: () => HiveHealth.average,
       ),
       temperament: Temperament.values.firstWhere(
             (e) => e.name == map['temperament'],
@@ -127,6 +130,8 @@ class InspectionModel {
       temperature: map['temperature']?.toDouble(),
       humidity: map['humidity']?.toDouble(),
       customFields: map['custom_fields'] != null ? Map<String, dynamic>.from(map['custom_fields']) : null,
+      // --- 4. تم تغيير المفتاح ---
+      actions: List<Map<String, dynamic>>.from(map['actions'] ?? []),
     );
   }
 
@@ -154,6 +159,8 @@ class InspectionModel {
     double? temperature,
     double? humidity,
     Map<String, dynamic>? customFields,
+    // --- 5. تم تغيير اسم الحقل ---
+    List<Map<String, dynamic>>? actions,
   }) {
     return InspectionModel(
       id: id ?? this.id,
@@ -174,6 +181,7 @@ class InspectionModel {
       temperature: temperature ?? this.temperature,
       humidity: humidity ?? this.humidity,
       customFields: customFields ?? this.customFields,
+      actions: actions ?? this.actions,
     );
   }
 }

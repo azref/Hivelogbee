@@ -14,17 +14,13 @@ class HiveService {
       handleData: (List<Map<String, dynamic>> data, EventSink<List<HiveModel>> sink) {
         try {
           final filtered = data.where((map) => map['user_id'] == userId).toList();
-
-          // --- ✅ الإصلاح: تحويل التاريخ إلى DateTime قبل الفرز ---
           final sorted = filtered..sort((a, b) {
             final dateA = DateTime.tryParse(a['created_date'] ?? '') ?? DateTime(1970);
             final dateB = DateTime.tryParse(b['created_date'] ?? '') ?? DateTime(1970);
             return dateB.compareTo(dateA);
           });
-
           sink.add(sorted.map((map) => HiveModel.fromMap(map)).toList());
         } catch (e) {
-          // في حالة حدوث أي خطأ أثناء التحويل أو الفرز، أرسل قائمة فارغة
           print('Error in HiveService StreamTransformer: $e');
           sink.add([]);
         }
@@ -32,6 +28,21 @@ class HiveService {
     ));
   }
 
+  // --- *** 1. الدالة الجديدة والمهمة التي تمت إضافتها *** ---
+  /// تجلب خلية واحدة محددة من قاعدة البيانات.
+  Future<HiveModel?> getHiveById(String hiveId) async {
+    try {
+      final response = await _client
+          .from('hives')
+          .select()
+          .eq('id', hiveId)
+          .single();
+      return HiveModel.fromMap(response);
+    } catch (e) {
+      print('فشل في جلب الخلية بواسطة ID: $e');
+      return null;
+    }
+  }
 
   Stream<HiveModel?> getHiveStream(String userId, String hiveId) {
     final stream = _client
@@ -77,7 +88,6 @@ class HiveService {
     return stream.transform(StreamTransformer.fromHandlers(
       handleData: (List<Map<String, dynamic>> data, EventSink<Map<String, dynamic>> sink) {
         final filtered = data.where((map) => map['user_id'] == userId);
-
         int totalHives = 0;
         int activeHives = 0;
         int nuclei = 0;
@@ -97,7 +107,7 @@ class HiveService {
               readyForDivision++;
             }
           }
-          if (hive.tags.contains('problem')) problemHives++;
+          // if (hive.tags.contains('problem')) problemHives++;
         }
 
         sink.add({
@@ -111,8 +121,6 @@ class HiveService {
       },
     ));
   }
-
-  // --- باقي الدوال (add, update, delete, etc.) تبقى كما هي ---
 
   Future<String> addHive(HiveModel hive) async {
     try {

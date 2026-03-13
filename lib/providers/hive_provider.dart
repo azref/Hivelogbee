@@ -3,28 +3,21 @@ import 'package:flutter/material.dart';
 import '../models/hive_model.dart';
 import '../services/hive_service.dart';
 
-/// HiveProvider: مسؤول فقط عن جلب قائمة الخلايا الكاملة،
-/// وتوفير دوال لفلترتها والبحث فيها.
 class HiveProvider extends ChangeNotifier {
   final HiveService _hiveService = HiveService();
 
-  // القائمة الرئيسية التي تحتوي على كل الخلايا
   List<HiveModel> _allHives = [];
-
   bool _isLoading = false;
   String? _error;
   String _searchQuery = '';
   StreamSubscription? _hivesSubscription;
   String? _currentUserId;
 
-  // --- Getters ---
   bool get isLoading => _isLoading;
   String? get error => _error;
   String get searchQuery => _searchQuery;
-  // Getter للوصول إلى القائمة الكاملة من الخارج (إذا لزم الأمر)
   List<HiveModel> get hives => _allHives;
 
-  /// تهيئة الـ Provider وتحديد المستخدم لبدء جلب البيانات.
   void initialize(String userId) {
     if (_currentUserId != userId) {
       _currentUserId = userId;
@@ -32,7 +25,6 @@ class HiveProvider extends ChangeNotifier {
     }
   }
 
-  /// الدالة الرئيسية لجلب وتحديث قائمة الخلايا عبر stream.
   Future<void> fetchHives() async {
     if (_currentUserId == null) return;
 
@@ -55,12 +47,9 @@ class HiveProvider extends ChangeNotifier {
     );
   }
 
-  /// دالة الفلترة التي تستخدمها الواجهة لعرض البيانات.
-  /// لا تغير حالة الـ Provider، بل تُرجع قائمة مفلترة.
   List<HiveModel> getFilteredHives(String filter) {
     List<HiveModel> tempHives = List.from(_allHives);
 
-    // 1. تطبيق فلتر البحث
     if (_searchQuery.isNotEmpty) {
       tempHives = tempHives.where((hive) {
         final query = _searchQuery.toLowerCase();
@@ -70,7 +59,6 @@ class HiveProvider extends ChangeNotifier {
       }).toList();
     }
 
-    // 2. تطبيق فلتر التبويب
     switch (filter) {
       case 'all':
         return tempHives;
@@ -79,13 +67,13 @@ class HiveProvider extends ChangeNotifier {
       case 'nuclei':
         return tempHives.where((h) => h.isNucleus).toList();
       case 'issues':
-        return tempHives.where((h) => h.tags.contains('problem')).toList();
+      // return tempHives.where((h) => h.tags.contains('problem')).toList();
+        return tempHives;
       default:
         return tempHives;
     }
   }
 
-  /// تحديث قيمة البحث من الواجهة.
   void setSearchQuery(String query) {
     if (_searchQuery != query) {
       _searchQuery = query;
@@ -93,8 +81,6 @@ class HiveProvider extends ChangeNotifier {
     }
   }
 
-  /// دالة مساعدة لإيجاد خلية بواسطة الـ ID الخاص بها.
-  /// هذه الدالة ضرورية لشاشات التفاصيل.
   HiveModel? getHiveById(String hiveId) {
     try {
       return _allHives.firstWhere((hive) => hive.id == hiveId);
@@ -103,21 +89,16 @@ class HiveProvider extends ChangeNotifier {
     }
   }
 
-  // --- *** هذا هو الجزء الذي تم تعديله *** ---
-
-  /// إضافة خلية جديدة.
-  /// ملاحظة: الـ stream في `fetchHives` سيقوم بتحديث القائمة تلقائيًا.
   Future<void> addHive(HiveModel hive) async {
     try {
       await _hiveService.addHive(hive);
     } catch (e) {
       _error = 'فشل في إضافة الخلية: $e';
       notifyListeners();
-      rethrow; // إعادة رمي الخطأ لتتمكن الواجهة من التعامل معه
+      rethrow;
     }
   }
 
-  /// تحديث بيانات خلية موجودة.
   Future<void> updateHive(HiveModel hive) async {
     try {
       await _hiveService.updateHive(hive);
@@ -128,7 +109,22 @@ class HiveProvider extends ChangeNotifier {
     }
   }
 
-  /// حذف خلية.
+  // --- *** 1. الدالة الجديدة والقوية للتحديث الفوري *** ---
+  /// تقوم بتحديث حالة خلية واحدة في الذاكرة وإجبار الواجهة على إعادة الرسم.
+  /// تُستخدم للتحديث المتفائل بعد نجاح عملية في الخادم.
+  void forceUpdateHiveState(HiveModel updatedHive) {
+    // البحث عن فهرس الخلية القديمة في القائمة
+    final index = _allHives.indexWhere((hive) => hive.id == updatedHive.id);
+
+    // إذا تم العثور على الخلية، قم باستبدالها
+    if (index != -1) {
+      _allHives[index] = updatedHive;
+      print('--- HiveProvider: تم تحديث الخلية ${updatedHive.hiveNumber} في الحالة المحلية. ---');
+      // إعلام جميع المستمعين بالتغيير
+      notifyListeners();
+    }
+  }
+
   Future<void> deleteHive(String hiveId) async {
     try {
       await _hiveService.deleteHive(hiveId);
@@ -138,8 +134,6 @@ class HiveProvider extends ChangeNotifier {
       rethrow;
     }
   }
-
-  // --- *** نهاية الجزء المعدل *** ---
 
   @override
   void dispose() {
