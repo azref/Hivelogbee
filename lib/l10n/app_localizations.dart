@@ -65,7 +65,8 @@ import 'app_localizations_tr.dart';
 /// be consistent with the languages listed in the AppLocalizations.supportedLocales
 /// property.
 abstract class AppLocalizations {
-  AppLocalizations(String locale) : localeName = intl.Intl.canonicalizedLocale(locale.toString());
+  AppLocalizations(String locale)
+      : localeName = intl.Intl.canonicalizedLocale(locale.toString());
 
   final String localeName;
 
@@ -73,7 +74,8 @@ abstract class AppLocalizations {
     return Localizations.of<AppLocalizations>(context, AppLocalizations);
   }
 
-  static const LocalizationsDelegate<AppLocalizations> delegate = _AppLocalizationsDelegate();
+  static const LocalizationsDelegate<AppLocalizations> delegate =
+      _AppLocalizationsDelegate();
 
   /// A list of this localizations delegate along with the default localizations
   /// delegates.
@@ -85,7 +87,8 @@ abstract class AppLocalizations {
   /// Additional delegates can be added by appending to this list in
   /// MaterialApp. This list does not have to be used at all if a custom list
   /// of delegates is preferred or required.
-  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates = <LocalizationsDelegate<dynamic>>[
+  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates =
+      <LocalizationsDelegate<dynamic>>[
     delegate,
     GlobalMaterialLocalizations.delegate,
     GlobalCupertinoLocalizations.delegate,
@@ -103,462 +106,751 @@ abstract class AppLocalizations {
 
   /// No description provided for @appName.
   ///
-  /// In en, this message translates to:
+  /// In ar, this message translates to:
   /// **'HiveLog Bee'**
   String get appName;
 
   /// No description provided for @appSubtitle.
   ///
-  /// In en, this message translates to:
-  /// **'Smart Beekeeping Management'**
+  /// In ar, this message translates to:
+  /// **'إدارة المناحل بذكاء'**
   String get appSubtitle;
 
   /// No description provided for @login.
   ///
-  /// In en, this message translates to:
-  /// **'Login'**
+  /// In ar, this message translates to:
+  /// **'تسجيل الدخول'**
   String get login;
 
   /// No description provided for @register.
   ///
-  /// In en, this message translates to:
-  /// **'Create New Account'**
+  /// In ar, this message translates to:
+  /// **'إنشاء حساب جديد'**
   String get register;
 
   /// No description provided for @email.
   ///
-  /// In en, this message translates to:
-  /// **'Email'**
+  /// In ar, this message translates to:
+  /// **'البريد الإلكتروني'**
   String get email;
 
   /// No description provided for @password.
   ///
-  /// In en, this message translates to:
-  /// **'Password'**
+  /// In ar, this message translates to:
+  /// **'كلمة المرور'**
   String get password;
 
   /// No description provided for @confirm_password.
   ///
-  /// In en, this message translates to:
-  /// **'Confirm Password'**
+  /// In ar, this message translates to:
+  /// **'تأكيد كلمة المرور'**
   String get confirm_password;
 
   /// No description provided for @full_name.
   ///
-  /// In en, this message translates to:
-  /// **'Full Name'**
+  /// In ar, this message translates to:
+  /// **'الاسم الكامل'**
   String get full_name;
 
   /// No description provided for @forgot_password.
   ///
-  /// In en, this message translates to:
-  /// **'Forgot Password?'**
+  /// In ar, this message translates to:
+  /// **'نسيت كلمة المرور؟'**
   String get forgot_password;
 
   /// No description provided for @remember_me.
   ///
-  /// In en, this message translates to:
-  /// **'Remember Me'**
+  /// In ar, this message translates to:
+  /// **'تذكرني'**
   String get remember_me;
 
   /// No description provided for @accept_terms.
   ///
-  /// In en, this message translates to:
-  /// **'I agree to Terms of Service and Privacy Policy'**
+  /// In ar, this message translates to:
+  /// **'أوافق على شروط الاستخدام وسياسة الخصوصية'**
   String get accept_terms;
 
   /// No description provided for @home.
   ///
-  /// In en, this message translates to:
-  /// **'Home'**
+  /// In ar, this message translates to:
+  /// **'الرئيسية'**
   String get home;
 
   /// No description provided for @hives.
   ///
-  /// In en, this message translates to:
-  /// **'Hives'**
+  /// In ar, this message translates to:
+  /// **'الخلايا'**
   String get hives;
 
   /// No description provided for @inspections.
   ///
-  /// In en, this message translates to:
-  /// **'Inspections'**
+  /// In ar, this message translates to:
+  /// **'الفحوصات'**
   String get inspections;
 
   /// No description provided for @treatments.
   ///
-  /// In en, this message translates to:
-  /// **'Treatments'**
+  /// In ar, this message translates to:
+  /// **'العلاجات'**
   String get treatments;
 
   /// No description provided for @production.
   ///
-  /// In en, this message translates to:
-  /// **'Production'**
+  /// In ar, this message translates to:
+  /// **'الإنتاج'**
   String get production;
 
   /// No description provided for @reminders.
   ///
-  /// In en, this message translates to:
-  /// **'Reminders'**
+  /// In ar, this message translates to:
+  /// **'التذكيرات'**
   String get reminders;
 
   /// No description provided for @knowledge.
   ///
-  /// In en, this message translates to:
-  /// **'Knowledge'**
+  /// In ar, this message translates to:
+  /// **'المعرفة'**
   String get knowledge;
 
   /// No description provided for @settings.
   ///
-  /// In en, this message translates to:
-  /// **'Settings'**
+  /// In ar, this message translates to:
+  /// **'الإعدادات'**
   String get settings;
 
   /// No description provided for @profile.
   ///
-  /// In en, this message translates to:
-  /// **'Profile'**
+  /// In ar, this message translates to:
+  /// **'الملف الشخصي'**
   String get profile;
 
   /// No description provided for @statistics.
   ///
-  /// In en, this message translates to:
-  /// **'Statistics'**
+  /// In ar, this message translates to:
+  /// **'الإحصائيات'**
   String get statistics;
 
   /// No description provided for @weather.
   ///
-  /// In en, this message translates to:
-  /// **'Weather'**
+  /// In ar, this message translates to:
+  /// **'الطقس'**
   String get weather;
 
   /// No description provided for @add_hive.
   ///
-  /// In en, this message translates to:
-  /// **'Add Hive'**
+  /// In ar, this message translates to:
+  /// **'إضافة خلية'**
   String get add_hive;
 
   /// No description provided for @add_inspection.
   ///
-  /// In en, this message translates to:
-  /// **'Add Inspection'**
+  /// In ar, this message translates to:
+  /// **'إضافة فحص'**
   String get add_inspection;
 
   /// No description provided for @add_treatment.
   ///
-  /// In en, this message translates to:
-  /// **'Add Treatment'**
+  /// In ar, this message translates to:
+  /// **'إضافة علاج'**
   String get add_treatment;
 
   /// No description provided for @hive_number.
   ///
-  /// In en, this message translates to:
-  /// **'Hive Number'**
+  /// In ar, this message translates to:
+  /// **'رقم الخلية'**
   String get hive_number;
 
   /// No description provided for @hive_status.
   ///
-  /// In en, this message translates to:
-  /// **'Hive Status'**
+  /// In ar, this message translates to:
+  /// **'حالة الخلية'**
   String get hive_status;
 
   /// No description provided for @queen_status.
   ///
-  /// In en, this message translates to:
-  /// **'Queen Status'**
+  /// In ar, this message translates to:
+  /// **'حالة الملكة'**
   String get queen_status;
 
   /// No description provided for @frame_count.
   ///
-  /// In en, this message translates to:
-  /// **'Frame Count'**
+  /// In ar, this message translates to:
+  /// **'عدد الإطارات'**
   String get frame_count;
 
   /// No description provided for @honey_frames.
   ///
-  /// In en, this message translates to:
-  /// **'Honey Frames'**
+  /// In ar, this message translates to:
+  /// **'إطارات عسل'**
   String get honey_frames;
 
   /// No description provided for @brood_frames.
   ///
-  /// In en, this message translates to:
-  /// **'Brood Frames'**
+  /// In ar, this message translates to:
+  /// **'إطارات حضنة'**
   String get brood_frames;
 
   /// No description provided for @save.
   ///
-  /// In en, this message translates to:
-  /// **'Save'**
+  /// In ar, this message translates to:
+  /// **'حفظ'**
   String get save;
 
   /// No description provided for @cancel.
   ///
-  /// In en, this message translates to:
-  /// **'Cancel'**
+  /// In ar, this message translates to:
+  /// **'إلغاء'**
   String get cancel;
 
   /// No description provided for @delete.
   ///
-  /// In en, this message translates to:
-  /// **'Delete'**
+  /// In ar, this message translates to:
+  /// **'حذف'**
   String get delete;
 
   /// No description provided for @edit.
   ///
-  /// In en, this message translates to:
-  /// **'Edit'**
+  /// In ar, this message translates to:
+  /// **'تعديل'**
   String get edit;
 
   /// No description provided for @search.
   ///
-  /// In en, this message translates to:
-  /// **'Search'**
+  /// In ar, this message translates to:
+  /// **'البحث'**
   String get search;
 
   /// No description provided for @filter.
   ///
-  /// In en, this message translates to:
-  /// **'Filter'**
+  /// In ar, this message translates to:
+  /// **'تصفية'**
   String get filter;
 
   /// No description provided for @sort.
   ///
-  /// In en, this message translates to:
-  /// **'Sort'**
+  /// In ar, this message translates to:
+  /// **'ترتيب'**
   String get sort;
 
   /// No description provided for @date.
   ///
-  /// In en, this message translates to:
-  /// **'Date'**
+  /// In ar, this message translates to:
+  /// **'التاريخ'**
   String get date;
 
   /// No description provided for @notes.
   ///
-  /// In en, this message translates to:
-  /// **'Notes'**
+  /// In ar, this message translates to:
+  /// **'الملاحظات'**
   String get notes;
 
   /// No description provided for @location.
   ///
-  /// In en, this message translates to:
-  /// **'Location'**
+  /// In ar, this message translates to:
+  /// **'الموقع'**
   String get location;
 
   /// No description provided for @temperature.
   ///
-  /// In en, this message translates to:
-  /// **'Temperature'**
+  /// In ar, this message translates to:
+  /// **'درجة الحرارة'**
   String get temperature;
 
   /// No description provided for @humidity.
   ///
-  /// In en, this message translates to:
-  /// **'Humidity'**
+  /// In ar, this message translates to:
+  /// **'الرطوبة'**
   String get humidity;
 
   /// No description provided for @wind_speed.
   ///
-  /// In en, this message translates to:
-  /// **'Wind Speed'**
+  /// In ar, this message translates to:
+  /// **'سرعة الرياح'**
   String get wind_speed;
 
   /// No description provided for @language.
   ///
-  /// In en, this message translates to:
-  /// **'Language'**
+  /// In ar, this message translates to:
+  /// **'اللغة'**
   String get language;
 
   /// No description provided for @theme.
   ///
-  /// In en, this message translates to:
-  /// **'Theme'**
+  /// In ar, this message translates to:
+  /// **'المظهر'**
   String get theme;
 
   /// No description provided for @notifications.
   ///
-  /// In en, this message translates to:
-  /// **'Notifications'**
+  /// In ar, this message translates to:
+  /// **'الإشعارات'**
   String get notifications;
 
   /// No description provided for @backup.
   ///
-  /// In en, this message translates to:
-  /// **'Backup'**
+  /// In ar, this message translates to:
+  /// **'النسخ الاحتياطي'**
   String get backup;
 
   /// No description provided for @about.
   ///
-  /// In en, this message translates to:
-  /// **'About'**
+  /// In ar, this message translates to:
+  /// **'حول التطبيق'**
   String get about;
 
   /// No description provided for @logout.
   ///
-  /// In en, this message translates to:
-  /// **'Logout'**
+  /// In ar, this message translates to:
+  /// **'تسجيل الخروج'**
   String get logout;
 
   /// No description provided for @total_hives.
   ///
-  /// In en, this message translates to:
-  /// **'Total Hives'**
+  /// In ar, this message translates to:
+  /// **'إجمالي الخلايا'**
   String get total_hives;
 
   /// No description provided for @total_production.
   ///
-  /// In en, this message translates to:
-  /// **'Total Production'**
+  /// In ar, this message translates to:
+  /// **'إجمالي الإنتاج'**
   String get total_production;
 
   /// No description provided for @active_treatments.
   ///
-  /// In en, this message translates to:
-  /// **'Active Treatments'**
+  /// In ar, this message translates to:
+  /// **'العلاجات النشطة'**
   String get active_treatments;
 
   /// No description provided for @pending_inspections.
   ///
-  /// In en, this message translates to:
-  /// **'Pending Inspections'**
+  /// In ar, this message translates to:
+  /// **'الفحوصات المعلقة'**
   String get pending_inspections;
 
   /// No description provided for @kg.
   ///
-  /// In en, this message translates to:
-  /// **'kg'**
+  /// In ar, this message translates to:
+  /// **'كغ'**
   String get kg;
 
   /// No description provided for @celsius.
   ///
-  /// In en, this message translates to:
-  /// **'°C'**
+  /// In ar, this message translates to:
+  /// **'°م'**
   String get celsius;
 
   /// No description provided for @percent.
   ///
-  /// In en, this message translates to:
+  /// In ar, this message translates to:
   /// **'%'**
   String get percent;
 
   /// No description provided for @kmh.
   ///
-  /// In en, this message translates to:
-  /// **'km/h'**
+  /// In ar, this message translates to:
+  /// **'كم/س'**
   String get kmh;
 
   /// No description provided for @light_mode.
   ///
-  /// In en, this message translates to:
-  /// **'Light Mode'**
+  /// In ar, this message translates to:
+  /// **'الوضع النهاري'**
   String get light_mode;
 
   /// No description provided for @dark_mode.
   ///
-  /// In en, this message translates to:
-  /// **'Dark Mode'**
+  /// In ar, this message translates to:
+  /// **'الوضع الليلي'**
   String get dark_mode;
 
   /// No description provided for @system_mode.
   ///
-  /// In en, this message translates to:
-  /// **'System Mode'**
+  /// In ar, this message translates to:
+  /// **'تتبع النظام'**
   String get system_mode;
 
   /// No description provided for @push_notifications.
   ///
-  /// In en, this message translates to:
-  /// **'Push Notifications'**
+  /// In ar, this message translates to:
+  /// **'الإشعارات الفورية'**
   String get push_notifications;
 
   /// No description provided for @email_notifications.
   ///
-  /// In en, this message translates to:
-  /// **'Email Notifications'**
+  /// In ar, this message translates to:
+  /// **'الإشعارات بالبريد'**
   String get email_notifications;
 
   /// No description provided for @weather_alerts.
   ///
-  /// In en, this message translates to:
-  /// **'Weather Alerts'**
+  /// In ar, this message translates to:
+  /// **'تنبيهات الطقس'**
   String get weather_alerts;
 
   /// No description provided for @auto_backup.
   ///
-  /// In en, this message translates to:
-  /// **'Auto Backup'**
+  /// In ar, this message translates to:
+  /// **'النسخ الاحتياطي التلقائي'**
   String get auto_backup;
 
   /// No description provided for @offline_mode.
   ///
-  /// In en, this message translates to:
-  /// **'Offline Mode'**
+  /// In ar, this message translates to:
+  /// **'الوضع غير المتصل'**
   String get offline_mode;
 
   /// No description provided for @clear_cache.
   ///
-  /// In en, this message translates to:
-  /// **'Clear Cache'**
+  /// In ar, this message translates to:
+  /// **'مسح البيانات المؤقتة'**
   String get clear_cache;
 
   /// No description provided for @app_version.
   ///
-  /// In en, this message translates to:
-  /// **'App Version'**
+  /// In ar, this message translates to:
+  /// **'إصدار التطبيق'**
   String get app_version;
 
   /// No description provided for @contact_support.
   ///
-  /// In en, this message translates to:
-  /// **'Contact Support'**
+  /// In ar, this message translates to:
+  /// **'الدعم الفني'**
   String get contact_support;
 
   /// No description provided for @rate_app.
   ///
-  /// In en, this message translates to:
-  /// **'Rate App'**
+  /// In ar, this message translates to:
+  /// **'تقييم التطبيق'**
   String get rate_app;
 
   /// No description provided for @share_app.
   ///
-  /// In en, this message translates to:
-  /// **'Share App'**
+  /// In ar, this message translates to:
+  /// **'مشاركة التطبيق'**
   String get share_app;
 
   /// No description provided for @privacy_policy.
   ///
-  /// In en, this message translates to:
-  /// **'Privacy Policy'**
+  /// In ar, this message translates to:
+  /// **'سياسة الخصوصية'**
   String get privacy_policy;
 
   /// No description provided for @terms_of_service.
   ///
-  /// In en, this message translates to:
-  /// **'Terms of Service'**
+  /// In ar, this message translates to:
+  /// **'شروط الاستخدام'**
   String get terms_of_service;
 
   /// No description provided for @mapScreenTitle.
   ///
-  /// In en, this message translates to:
-  /// **'Map'**
+  /// In ar, this message translates to:
+  /// **'الخريطة'**
   String get mapScreenTitle;
 
   /// No description provided for @reports.
   ///
-  /// In en, this message translates to:
-  /// **'Reports'**
+  /// In ar, this message translates to:
+  /// **'التقارير'**
   String get reports;
 
   /// No description provided for @viewDetails.
   ///
-  /// In en, this message translates to:
-  /// **'View Details'**
+  /// In ar, this message translates to:
+  /// **'عرض التفاصيل'**
   String get viewDetails;
+
+  /// No description provided for @basic_info.
+  ///
+  /// In ar, this message translates to:
+  /// **'المعلومات الأساسية'**
+  String get basic_info;
+
+  /// No description provided for @hive_type.
+  ///
+  /// In ar, this message translates to:
+  /// **'نوع الخلية'**
+  String get hive_type;
+
+  /// No description provided for @full_hive.
+  ///
+  /// In ar, this message translates to:
+  /// **'خلية كاملة'**
+  String get full_hive;
+
+  /// No description provided for @nucleus_hive.
+  ///
+  /// In ar, this message translates to:
+  /// **'طرد (نويّة)'**
+  String get nucleus_hive;
+
+  /// No description provided for @installation_date.
+  ///
+  /// In ar, this message translates to:
+  /// **'تاريخ التركيب'**
+  String get installation_date;
+
+  /// No description provided for @map_location.
+  ///
+  /// In ar, this message translates to:
+  /// **'تحديد الموقع من الخريطة'**
+  String get map_location;
+
+  /// No description provided for @bee_breed.
+  ///
+  /// In ar, this message translates to:
+  /// **'سلالة النحل'**
+  String get bee_breed;
+
+  /// No description provided for @status_active.
+  ///
+  /// In ar, this message translates to:
+  /// **'نشطة'**
+  String get status_active;
+
+  /// No description provided for @status_weak.
+  ///
+  /// In ar, this message translates to:
+  /// **'ضعيفة'**
+  String get status_weak;
+
+  /// No description provided for @status_sick.
+  ///
+  /// In ar, this message translates to:
+  /// **'مريضة'**
+  String get status_sick;
+
+  /// No description provided for @status_dead.
+  ///
+  /// In ar, this message translates to:
+  /// **'ميتة'**
+  String get status_dead;
+
+  /// No description provided for @status_swarmed.
+  ///
+  /// In ar, this message translates to:
+  /// **'مطردة'**
+  String get status_swarmed;
+
+  /// No description provided for @queen_present.
+  ///
+  /// In ar, this message translates to:
+  /// **'موجودة'**
+  String get queen_present;
+
+  /// No description provided for @queen_absent.
+  ///
+  /// In ar, this message translates to:
+  /// **'غير موجودة'**
+  String get queen_absent;
+
+  /// No description provided for @queen_isNew.
+  ///
+  /// In ar, this message translates to:
+  /// **'عذراء'**
+  String get queen_isNew;
+
+  /// No description provided for @queen_old.
+  ///
+  /// In ar, this message translates to:
+  /// **'قديمة'**
+  String get queen_old;
+
+  /// No description provided for @queen_marked.
+  ///
+  /// In ar, this message translates to:
+  /// **'معلمة'**
+  String get queen_marked;
+
+  /// No description provided for @queen_unmarked.
+  ///
+  /// In ar, this message translates to:
+  /// **'غير معلمة'**
+  String get queen_unmarked;
+
+  /// No description provided for @breed_carniolan.
+  ///
+  /// In ar, this message translates to:
+  /// **'كرنيولي'**
+  String get breed_carniolan;
+
+  /// No description provided for @breed_italian.
+  ///
+  /// In ar, this message translates to:
+  /// **'إيطالي'**
+  String get breed_italian;
+
+  /// No description provided for @breed_caucasian.
+  ///
+  /// In ar, this message translates to:
+  /// **'قوقازي'**
+  String get breed_caucasian;
+
+  /// No description provided for @breed_buckfast.
+  ///
+  /// In ar, this message translates to:
+  /// **'بكفاست'**
+  String get breed_buckfast;
+
+  /// No description provided for @breed_local.
+  ///
+  /// In ar, this message translates to:
+  /// **'محلي'**
+  String get breed_local;
+
+  /// No description provided for @breed_hybrid.
+  ///
+  /// In ar, this message translates to:
+  /// **'هجين'**
+  String get breed_hybrid;
+
+  /// No description provided for @select_date.
+  ///
+  /// In ar, this message translates to:
+  /// **'اختر التاريخ'**
+  String get select_date;
+
+  /// No description provided for @error_enter_number.
+  ///
+  /// In ar, this message translates to:
+  /// **'يرجى إدخال رقم الخلية'**
+  String get error_enter_number;
+
+  /// No description provided for @error_invalid_number.
+  ///
+  /// In ar, this message translates to:
+  /// **'يرجى إدخال رقم صحيح'**
+  String get error_invalid_number;
+
+  /// No description provided for @hive_saved_success.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم حفظ الخلية بنجاح'**
+  String get hive_saved_success;
+
+  /// No description provided for @error_login_required.
+  ///
+  /// In ar, this message translates to:
+  /// **'خطأ: يجب تسجيل الدخول أولاً'**
+  String get error_login_required;
+
+  /// No description provided for @status_queenless.
+  ///
+  /// In ar, this message translates to:
+  /// **'يتيمة (بدون ملكة)'**
+  String get status_queenless;
+
+  /// No description provided for @status_split.
+  ///
+  /// In ar, this message translates to:
+  /// **'مقسومة'**
+  String get status_split;
+
+  /// No description provided for @status_merged.
+  ///
+  /// In ar, this message translates to:
+  /// **'مضمومة'**
+  String get status_merged;
+
+  /// No description provided for @hive_frames_distribution.
+  ///
+  /// In ar, this message translates to:
+  /// **'توزيع الإطارات'**
+  String get hive_frames_distribution;
+
+  /// No description provided for @error_invalid_value.
+  ///
+  /// In ar, this message translates to:
+  /// **'قيمة غير صالحة'**
+  String get error_invalid_value;
+
+  /// No description provided for @select_hive.
+  ///
+  /// In ar, this message translates to:
+  /// **'اختيار الخلية'**
+  String get select_hive;
+
+  /// No description provided for @select_hive_placeholder.
+  ///
+  /// In ar, this message translates to:
+  /// **'اختر خلية'**
+  String get select_hive_placeholder;
+
+  /// No description provided for @inspection_date.
+  ///
+  /// In ar, this message translates to:
+  /// **'تاريخ الفحص'**
+  String get inspection_date;
+
+  /// No description provided for @brood_status.
+  ///
+  /// In ar, this message translates to:
+  /// **'حالة الحضنة'**
+  String get brood_status;
+
+  /// No description provided for @select_brood_status_placeholder.
+  ///
+  /// In ar, this message translates to:
+  /// **'اختر حالة الحضنة'**
+  String get select_brood_status_placeholder;
+
+  /// No description provided for @environmental_data.
+  ///
+  /// In ar, this message translates to:
+  /// **'البيانات البيئية'**
+  String get environmental_data;
+
+  /// No description provided for @overall_status.
+  ///
+  /// In ar, this message translates to:
+  /// **'الحالة العامة'**
+  String get overall_status;
+
+  /// No description provided for @select_overall_status_placeholder.
+  ///
+  /// In ar, this message translates to:
+  /// **'اختر الحالة العامة'**
+  String get select_overall_status_placeholder;
+
+  /// No description provided for @detected_issues.
+  ///
+  /// In ar, this message translates to:
+  /// **'المشاكل المكتشفة'**
+  String get detected_issues;
+
+  /// No description provided for @select_issues_placeholder.
+  ///
+  /// In ar, this message translates to:
+  /// **'اختر المشاكل المكتشفة'**
+  String get select_issues_placeholder;
+
+  /// No description provided for @notes_placeholder.
+  ///
+  /// In ar, this message translates to:
+  /// **'اكتب ملاحظاتك هنا...'**
+  String get notes_placeholder;
+
+  /// No description provided for @error_select_hive.
+  ///
+  /// In ar, this message translates to:
+  /// **'يرجى اختيار خلية أولاً'**
+  String get error_select_hive;
+
+  /// No description provided for @inspection_saved_success.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم حفظ الفحص بنجاح'**
+  String get inspection_saved_success;
+
+  /// No description provided for @error_saving_inspection.
+  ///
+  /// In ar, this message translates to:
+  /// **'حدث خطأ أثناء حفظ الفحص'**
+  String get error_saving_inspection;
 }
 
-class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
+class _AppLocalizationsDelegate
+    extends LocalizationsDelegate<AppLocalizations> {
   const _AppLocalizationsDelegate();
 
   @override
@@ -567,28 +859,31 @@ class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> 
   }
 
   @override
-  bool isSupported(Locale locale) => <String>['ar', 'en', 'es', 'fr', 'tr'].contains(locale.languageCode);
+  bool isSupported(Locale locale) =>
+      <String>['ar', 'en', 'es', 'fr', 'tr'].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;
 }
 
 AppLocalizations lookupAppLocalizations(Locale locale) {
-
-
   // Lookup logic when only language code is specified.
   switch (locale.languageCode) {
-    case 'ar': return AppLocalizationsAr();
-    case 'en': return AppLocalizationsEn();
-    case 'es': return AppLocalizationsEs();
-    case 'fr': return AppLocalizationsFr();
-    case 'tr': return AppLocalizationsTr();
+    case 'ar':
+      return AppLocalizationsAr();
+    case 'en':
+      return AppLocalizationsEn();
+    case 'es':
+      return AppLocalizationsEs();
+    case 'fr':
+      return AppLocalizationsFr();
+    case 'tr':
+      return AppLocalizationsTr();
   }
 
   throw FlutterError(
-    'AppLocalizations.delegate failed to load unsupported locale "$locale". This is likely '
-    'an issue with the localizations generation tool. Please file an issue '
-    'on GitHub with a reproducible sample app and the gen-l10n configuration '
-    'that was used.'
-  );
+      'AppLocalizations.delegate failed to load unsupported locale "$locale". This is likely '
+      'an issue with the localizations generation tool. Please file an issue '
+      'on GitHub with a reproducible sample app and the gen-l10n configuration '
+      'that was used.');
 }

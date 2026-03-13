@@ -9,10 +9,16 @@ import '../widgets/custom_bottom_nav_bar.dart';
 import '../widgets/section_holder.dart';
 import '../utils/app_theme.dart';
 import 'home_screen.dart';
+// --- 1. استيراد الشاشات الصحيحة ---
+import 'inspection_list_screen.dart';
 import 'treatment_list_screen.dart';
 import 'hive_list_screen.dart';
 import 'add_hive_screen.dart';
 import 'hive_details_screen.dart';
+import 'add_inspection_screen.dart';
+import 'add_treatment_screen.dart';
+import 'add_division_screen.dart';
+
 
 @immutable
 class NavigationState {
@@ -116,6 +122,7 @@ class _MainScreenHolderState extends State<MainScreenHolder> {
       ];
     });
   }
+
   void _onSubTabTapped(String id) {
     if (id == 'home') {
       _onMainTabTapped('home');
@@ -127,66 +134,98 @@ class _MainScreenHolderState extends State<MainScreenHolder> {
   }
 
   void _handleHiveAction(String action, HiveModel hive) {
-    print("Action: $action on Hive: ${hive.hiveNumber}");
+    Future<void> navigateAndRefresh(Widget screen) async {
+      final result = await Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => screen),
+      );
+      if (result == true && mounted) {
+        final userId = Provider.of<AuthProvider>(context, listen: false).user?.id;
+        if (userId != null) {
+          Provider.of<HiveProvider>(context, listen: false).fetchHives();
+        }
+      }
+    }
+
+    switch (action) {
+      case 'inspect':
+        navigateAndRefresh(AddInspectionScreen(hiveId: hive.id));
+        break;
+      case 'treat':
+        navigateAndRefresh(AddTreatmentScreen(treatmentId: hive.id));
+        break;
+      case 'split':
+        navigateAndRefresh(AddDivisionScreen(divisionId: hive.id));
+        break;
+      case 'edit':
+      // navigateAndRefresh(AddHiveScreen(hiveId: hive.id));
+        break;
+      default:
+        print("Action: $action on Hive: ${hive.hiveNumber}");
+    }
   }
 
-  List<Widget>? _buildHiveDetailsActions() {
-    if (_currentState.detailItemId == null) return null;
-
-    final hiveProvider = Provider.of<HiveProvider>(context, listen: false);
-    try {
-      final hive = hiveProvider.hives.firstWhere((h) => h.id == _currentState.detailItemId);
-
-      return [
-        PopupMenuButton<String>(
-          onSelected: (action) => _handleHiveAction(action, hive),
-          itemBuilder: (context) => [
-            PopupMenuItem(
-              value: 'inspect',
-              child: Row(
-                children: [
-                  const Icon(Icons.search, size: 20),
-                  const SizedBox(width: 8),
-                  const Text('إضافة فحص'),
-                ],
-              ),
+  void _showActionsDialog(BuildContext context, HiveModel hive) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: AppTheme.primaryYellow,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Center(child: Text('إجراءات الخلية', style: const TextStyle(color: AppTheme.darkBrown, fontWeight: FontWeight.bold))),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _buildDialogActionItem(
+              context: context,
+              icon: Icons.search,
+              text: 'إضافة فحص',
+              onTap: () {
+                Navigator.pop(context);
+                _handleHiveAction('inspect', hive);
+              },
             ),
-            PopupMenuItem(
-              value: 'treat',
-              child: Row(
-                children: [
-                  const Icon(Icons.medical_services, size: 20),
-                  const SizedBox(width: 8),
-                  const Text('إضافة علاج'),
-                ],
-              ),
+            _buildDialogActionItem(
+              context: context,
+              icon: Icons.medical_services,
+              text: 'إضافة علاج',
+              onTap: () {
+                Navigator.pop(context);
+                _handleHiveAction('treat', hive);
+              },
             ),
-            PopupMenuItem(
-              value: 'split',
-              child: const Row(
-                children: [
-                  Icon(Icons.call_split, size: 20),
-                  SizedBox(width: 8),
-                  Text('تقسيم الخلية'),
-                ],
-              ),
+            _buildDialogActionItem(
+              context: context,
+              icon: Icons.call_split,
+              text: 'تقسيم الخلية',
+              onTap: () {
+                Navigator.pop(context);
+                _handleHiveAction('split', hive);
+              },
             ),
-            PopupMenuItem(
-              value: 'edit',
-              child: Row(
-                children: [
-                  const Icon(Icons.edit, size: 20),
-                  const SizedBox(width: 8),
-                  const Text('تعديل'),
-                ],
-              ),
+            _buildDialogActionItem(
+              context: context,
+              icon: Icons.edit,
+              text: 'تعديل',
+              onTap: () {
+                Navigator.pop(context);
+                _handleHiveAction('edit', hive);
+              },
             ),
           ],
         ),
-      ];
-    } catch (e) {
-      return null;
-    }
+      ),
+    );
+  }
+
+  Widget _buildDialogActionItem({required BuildContext context, required IconData icon, required String text, required VoidCallback onTap}) {
+    return ListTile(
+      leading: Icon(icon, color: AppTheme.darkBrown),
+      title: Text(
+        text,
+        style: const TextStyle(color: AppTheme.darkBrown, fontSize: 18, fontWeight: FontWeight.w600),
+      ),
+      onTap: onTap,
+    );
   }
 
   PreferredSizeWidget _buildCurrentAppBar() {
@@ -197,11 +236,7 @@ class _MainScreenHolderState extends State<MainScreenHolder> {
       final hiveProvider = Provider.of<HiveProvider>(context, listen: false);
       try {
         final hive = hiveProvider.hives.firstWhere((h) => h.id == _currentState.detailItemId);
-        if (hive.isNucleus) {
-          title = 'طرد رقم ${hive.hiveNumber}';
-        } else {
-          title = 'خلية رقم ${hive.hiveNumber}';
-        }
+        title = '${hive.isNucleus ? 'طرد' : 'خلية'} ${hive.hiveNumber}';
       } catch (e) {
         title = 'تفاصيل الخلية';
       }
@@ -214,7 +249,14 @@ class _MainScreenHolderState extends State<MainScreenHolder> {
 
     List<Widget>? additionalActions;
     if (_currentState.detailItemId != null) {
-      additionalActions = _buildHiveDetailsActions();
+      final hiveProvider = Provider.of<HiveProvider>(context, listen: false);
+      final hive = hiveProvider.hives.firstWhere((h) => h.id == _currentState.detailItemId);
+      additionalActions = [
+        IconButton(
+          icon: const Icon(Icons.more_vert),
+          onPressed: () => _showActionsDialog(context, hive),
+        ),
+      ];
     }
 
     return CustomAppBar(
@@ -226,7 +268,9 @@ class _MainScreenHolderState extends State<MainScreenHolder> {
     );
   }
 
+  // --- *** هذا هو الجزء الذي تم تعديله *** ---
   Widget _buildCurrentBody() {
+    // الحالة 1: عرض تفاصيل عنصر (مثل خلية)
     if (_currentState.detailItemId != null) {
       switch (_currentState.sectionId) {
         case 'hives':
@@ -238,43 +282,38 @@ class _MainScreenHolderState extends State<MainScreenHolder> {
       }
     }
 
-    if (_currentState.subSectionId != null) {
-      List<Widget> subScreens = [];
-      List<String> subScreenOrder = [];
-      final subNavs = _subNavItems[_currentState.sectionId]?.where((item) => item.id != 'home').toList() ?? [];
-
-      for (var navItem in subNavs) {
-        subScreenOrder.add(navItem.id);
-        switch (_currentState.sectionId) {
-          case 'hives':
-            subScreens.add(HiveListScreen(
-              filter: navItem.id,
-              onHiveTap: (hiveId, hiveNumber, isNucleus) {
-                _navigateTo(NavigationState(
-                  sectionId: 'hives',
-                  subSectionId: 'overview',
-                  detailItemId: hiveId,
-                  detailTitle: '${isNucleus ? 'طرد' : 'خلية'} $hiveNumber',
-                ));
-              },
+    // الحالة 2: عرض قسم رئيسي مع تبويبات فرعية (مثل قسم الخلايا أو الفحوصات)
+    if (_currentState.sectionId != 'home' && _currentState.sectionId != 'knowledge') {
+      switch (_currentState.sectionId) {
+        case 'hives':
+          return HiveListScreen(filter: _currentState.subSectionId ?? 'all', onHiveTap: (hiveId, hiveNumber, isNucleus) {
+            _navigateTo(NavigationState(
+              sectionId: 'hives',
+              subSectionId: 'overview',
+              detailItemId: hiveId,
+              detailTitle: '${isNucleus ? 'طرد' : 'خلية'} $hiveNumber',
             ));
-            break;
-          case 'treatments':
-            subScreens.add(TreatmentListScreen(filter: navItem.id));
-            break;
-          default:
-            subScreens.add(Center(child: Text('قسم قيد التطوير: ${navItem.label}')));
-        }
+          });
+      // 2. إضافة حالة الفحوصات
+        case 'inspections':
+          return const InspectionListScreen(); // لا تحتاج فلتر لأنها الشاشة العامة
+        case 'treatments':
+          return TreatmentListScreen(filter: _currentState.subSectionId ?? 'all');
+        default:
+          return Center(child: Text('قسم قيد التطوير: ${_currentState.sectionId}'));
       }
-      return SectionHolder(
-        activeSubSectionId: _currentState.subSectionId!,
-        pageOrder: subScreenOrder,
-        pages: subScreens,
-      );
     }
 
-    return const HomeScreen();
+    // الحالة 3: عرض الشاشة الرئيسية أو شاشة المعرفة (لا تحتوي على تبويبات فرعية)
+    switch (_currentState.sectionId) {
+      case 'knowledge':
+      // return const KnowledgeScreen(); // افترض أن لديك شاشة المعرفة
+        return const Center(child: Text('شاشة المعرفة'));
+      default: // 'home'
+        return const HomeScreen();
+    }
   }
+  // --- *** نهاية الجزء المعدل *** ---
 
   Widget _buildCurrentBottomNavBar() {
     if (_currentState.detailItemId != null) {
@@ -290,7 +329,8 @@ class _MainScreenHolderState extends State<MainScreenHolder> {
       );
     }
 
-    if (_currentState.subSectionId != null) {
+    // لا نعرض شريط التبويبات الفرعية للأقسام التي لا تحتوي عليها
+    if (_currentState.sectionId == 'hives' || _currentState.sectionId == 'treatments') {
       final items = _subNavItems[_currentState.sectionId] ?? [];
       return CustomBottomNavBar(
         items: items,
@@ -309,7 +349,19 @@ class _MainScreenHolderState extends State<MainScreenHolder> {
   Widget? _buildFloatingActionButton() {
     if (_currentState.sectionId == 'hives' && _currentState.detailItemId == null) {
       return FloatingActionButton(
-        onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const AddHiveScreen())),
+        onPressed: () async {
+          final result = await Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const AddHiveScreen()),
+          );
+
+          if (result == true && mounted) {
+            final userId = Provider.of<AuthProvider>(context, listen: false).user?.id;
+            if (userId != null) {
+              Provider.of<HiveProvider>(context, listen: false).fetchHives();
+            }
+          }
+        },
         backgroundColor: AppTheme.primaryYellow,
         child: const Icon(Icons.add, color: AppTheme.darkBrown),
       );

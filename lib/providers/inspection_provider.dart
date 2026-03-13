@@ -1,5 +1,6 @@
-import 'dart:async'; // --- تم الإصلاح ---
+import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart'; // --- 1. استيراد Supabase ---
 import '../models/inspection_model.dart';
 import '../services/inspection_service.dart';
 
@@ -40,7 +41,6 @@ class InspectionProvider extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
     _inspectionsSubscription?.cancel();
-    // --- تم الإصلاح: تمرير userId كمعامل مطلوب ---
     _inspectionsSubscription = _inspectionService.getInspectionsStream(userId: userId).listen(
           (inspectionsList) {
         _inspections = inspectionsList;
@@ -96,7 +96,6 @@ class InspectionProvider extends ChangeNotifier {
     );
   }
 
-  // ... باقي الكود يبقى كما هو في الغالب ...
   void _applyFilters() {
     List<InspectionModel> tempInspections = List.from(_inspections);
 
@@ -144,21 +143,44 @@ class InspectionProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  // --- *** هذا هو الجزء الذي تم تعديله بالكامل *** ---
   Future<void> addInspection(InspectionModel inspection) async {
     try {
       _isLoading = true;
       _error = null;
       notifyListeners();
-      await _inspectionService.addInspection(inspection);
+
+      // 2. استدعاء دالة RPC بدلاً من الخدمة
+      await Supabase.instance.client.rpc(
+        'add_inspection_and_update_hive',
+        params: {
+          'p_hive_id': inspection.hiveId,
+          'p_date': inspection.date.toIso8601String(),
+          'p_hive_health': inspection.hiveHealth.name,
+          'p_temperament': inspection.temperament.name,
+          'p_queen_presence': inspection.queenPresence.name,
+          'p_queen_cells_seen': inspection.queenCellsSeen,
+          'p_eggs_seen': inspection.eggsSeen,
+          'p_brood_pattern': inspection.broodPattern.name,
+          'p_brood_frames': inspection.broodFrames,
+          'p_honey_frames': inspection.honeyFrames,
+          'p_issues': inspection.issues.map((e) => e.name).toList(),
+          'p_notes': inspection.notes,
+          'p_temperature': inspection.temperature,
+          'p_humidity': inspection.humidity,
+        },
+      );
+
       _isLoading = false;
       notifyListeners();
     } catch (e) {
       _error = e.toString();
       _isLoading = false;
       notifyListeners();
-      rethrow;
+      rethrow; // أعد رمي الخطأ ليتم التقاطه في واجهة المستخدم
     }
   }
+  // --- *** نهاية الجزء المعدل *** ---
 
   Future<void> updateInspection(InspectionModel inspection) async {
     try {

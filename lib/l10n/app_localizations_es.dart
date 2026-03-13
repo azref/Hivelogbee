@@ -12,163 +12,164 @@ class AppLocalizationsEs extends AppLocalizations {
   String get appName => 'HiveLog Bee';
 
   @override
-  String get appSubtitle => 'Smart Beekeeping Management';
+  String get appSubtitle => 'Gestión Inteligente de Colmenares';
 
   @override
-  String get login => 'Login';
+  String get login => 'Iniciar Sesión';
 
   @override
-  String get register => 'Create New Account';
+  String get register => 'Crear Nueva Cuenta';
 
   @override
-  String get email => 'Email';
+  String get email => 'Correo Electrónico';
 
   @override
-  String get password => 'Password';
+  String get password => 'Contraseña';
 
   @override
-  String get confirm_password => 'Confirm Password';
+  String get confirm_password => 'Confirmar Contraseña';
 
   @override
-  String get full_name => 'Full Name';
+  String get full_name => 'Nombre Completo';
 
   @override
-  String get forgot_password => 'Forgot Password?';
+  String get forgot_password => '¿Olvidaste tu contraseña?';
 
   @override
-  String get remember_me => 'Remember Me';
+  String get remember_me => 'Recordarme';
 
   @override
-  String get accept_terms => 'I agree to Terms of Service and Privacy Policy';
+  String get accept_terms =>
+      'Acepto los Términos de Servicio y la Política de Privacidad';
 
   @override
-  String get home => 'Home';
+  String get home => 'Inicio';
 
   @override
-  String get hives => 'Hives';
+  String get hives => 'Colmenas';
 
   @override
-  String get inspections => 'Inspections';
+  String get inspections => 'Inspecciones';
 
   @override
-  String get treatments => 'Treatments';
+  String get treatments => 'Tratamientos';
 
   @override
-  String get production => 'Production';
+  String get production => 'Producción';
 
   @override
-  String get reminders => 'Reminders';
+  String get reminders => 'Recordatorios';
 
   @override
-  String get knowledge => 'Knowledge';
+  String get knowledge => 'Conocimiento';
 
   @override
-  String get settings => 'Settings';
+  String get settings => 'Ajustes';
 
   @override
-  String get profile => 'Profile';
+  String get profile => 'Perfil';
 
   @override
-  String get statistics => 'Statistics';
+  String get statistics => 'Estadísticas';
 
   @override
-  String get weather => 'Weather';
+  String get weather => 'Clima';
 
   @override
-  String get add_hive => 'Add Hive';
+  String get add_hive => 'Añadir Colmena';
 
   @override
-  String get add_inspection => 'Add Inspection';
+  String get add_inspection => 'Añadir Inspección';
 
   @override
-  String get add_treatment => 'Add Treatment';
+  String get add_treatment => 'Añadir Tratamiento';
 
   @override
-  String get hive_number => 'Hive Number';
+  String get hive_number => 'Número de Colmena';
 
   @override
-  String get hive_status => 'Hive Status';
+  String get hive_status => 'Estado de la Colmena';
 
   @override
-  String get queen_status => 'Queen Status';
+  String get queen_status => 'Estado de la Reina';
 
   @override
-  String get frame_count => 'Frame Count';
+  String get frame_count => 'Número de Cuadros';
 
   @override
-  String get honey_frames => 'Honey Frames';
+  String get honey_frames => 'Cuadros de Miel';
 
   @override
-  String get brood_frames => 'Brood Frames';
+  String get brood_frames => 'Cuadros de Cría';
 
   @override
-  String get save => 'Save';
+  String get save => 'Guardar';
 
   @override
-  String get cancel => 'Cancel';
+  String get cancel => 'Cancelar';
 
   @override
-  String get delete => 'Delete';
+  String get delete => 'Eliminar';
 
   @override
-  String get edit => 'Edit';
+  String get edit => 'Editar';
 
   @override
-  String get search => 'Search';
+  String get search => 'Buscar';
 
   @override
-  String get filter => 'Filter';
+  String get filter => 'Filtrar';
 
   @override
-  String get sort => 'Sort';
+  String get sort => 'Ordenar';
 
   @override
-  String get date => 'Date';
+  String get date => 'Fecha';
 
   @override
-  String get notes => 'Notes';
+  String get notes => 'Notas';
 
   @override
-  String get location => 'Location';
+  String get location => 'Ubicación';
 
   @override
-  String get temperature => 'Temperature';
+  String get temperature => 'Temperatura';
 
   @override
-  String get humidity => 'Humidity';
+  String get humidity => 'Humedad';
 
   @override
-  String get wind_speed => 'Wind Speed';
+  String get wind_speed => 'Velocidad del Viento';
 
   @override
-  String get language => 'Language';
+  String get language => 'Idioma';
 
   @override
-  String get theme => 'Theme';
+  String get theme => 'Tema';
 
   @override
-  String get notifications => 'Notifications';
+  String get notifications => 'Notificaciones';
 
   @override
-  String get backup => 'Backup';
+  String get backup => 'Copia de Seguridad';
 
   @override
-  String get about => 'About';
+  String get about => 'Acerca de';
 
   @override
-  String get logout => 'Logout';
+  String get logout => 'Cerrar Sesión';
 
   @override
-  String get total_hives => 'Total Hives';
+  String get total_hives => 'Total de Colmenas';
 
   @override
-  String get total_production => 'Total Production';
+  String get total_production => 'Producción Total';
 
   @override
-  String get active_treatments => 'Active Treatments';
+  String get active_treatments => 'Tratamientos Activos';
 
   @override
-  String get pending_inspections => 'Pending Inspections';
+  String get pending_inspections => 'Inspecciones Pendientes';
 
   @override
   String get kg => 'kg';
@@ -183,56 +184,203 @@ class AppLocalizationsEs extends AppLocalizations {
   String get kmh => 'km/h';
 
   @override
-  String get light_mode => 'Light Mode';
+  String get light_mode => 'Modo Claro';
 
   @override
-  String get dark_mode => 'Dark Mode';
+  String get dark_mode => 'Modo Oscuro';
 
   @override
-  String get system_mode => 'System Mode';
+  String get system_mode => 'Modo del Sistema';
 
   @override
-  String get push_notifications => 'Push Notifications';
+  String get push_notifications => 'Notificaciones Push';
 
   @override
-  String get email_notifications => 'Email Notifications';
+  String get email_notifications => 'Notificaciones por Correo';
 
   @override
-  String get weather_alerts => 'Weather Alerts';
+  String get weather_alerts => 'Alertas Meteorológicas';
 
   @override
-  String get auto_backup => 'Auto Backup';
+  String get auto_backup => 'Copia de Seguridad Automática';
 
   @override
-  String get offline_mode => 'Offline Mode';
+  String get offline_mode => 'Modo sin Conexión';
 
   @override
-  String get clear_cache => 'Clear Cache';
+  String get clear_cache => 'Limpiar Caché';
 
   @override
-  String get app_version => 'App Version';
+  String get app_version => 'Versión de la App';
 
   @override
-  String get contact_support => 'Contact Support';
+  String get contact_support => 'Contactar a Soporte';
 
   @override
-  String get rate_app => 'Rate App';
+  String get rate_app => 'Calificar la App';
 
   @override
-  String get share_app => 'Share App';
+  String get share_app => 'Compartir la App';
 
   @override
-  String get privacy_policy => 'Privacy Policy';
+  String get privacy_policy => 'Política de Privacidad';
 
   @override
-  String get terms_of_service => 'Terms of Service';
+  String get terms_of_service => 'Términos de Servicio';
 
   @override
-  String get mapScreenTitle => 'Map';
+  String get mapScreenTitle => 'Mapa';
 
   @override
-  String get reports => 'Reports';
+  String get reports => 'Informes';
 
   @override
-  String get viewDetails => 'View Details';
+  String get viewDetails => 'Ver Detalles';
+
+  @override
+  String get basic_info => 'Información Básica';
+
+  @override
+  String get hive_type => 'Tipo de Colmena';
+
+  @override
+  String get full_hive => 'Colmena Completa';
+
+  @override
+  String get nucleus_hive => 'Núcleo';
+
+  @override
+  String get installation_date => 'Fecha de Instalación';
+
+  @override
+  String get map_location => 'Seleccionar Ubicación del Mapa';
+
+  @override
+  String get bee_breed => 'Raza de Abeja';
+
+  @override
+  String get status_active => 'Activa';
+
+  @override
+  String get status_weak => 'Débil';
+
+  @override
+  String get status_sick => 'Enferma';
+
+  @override
+  String get status_dead => 'Muerta';
+
+  @override
+  String get status_swarmed => 'Enjambrada';
+
+  @override
+  String get queen_present => 'Presente';
+
+  @override
+  String get queen_absent => 'Ausente';
+
+  @override
+  String get queen_isNew => 'Virgen';
+
+  @override
+  String get queen_old => 'Vieja';
+
+  @override
+  String get queen_marked => 'Marcada';
+
+  @override
+  String get queen_unmarked => 'No marcada';
+
+  @override
+  String get breed_carniolan => 'Carniola';
+
+  @override
+  String get breed_italian => 'Italiana';
+
+  @override
+  String get breed_caucasian => 'Caucásica';
+
+  @override
+  String get breed_buckfast => 'Buckfast';
+
+  @override
+  String get breed_local => 'Local';
+
+  @override
+  String get breed_hybrid => 'Híbrida';
+
+  @override
+  String get select_date => 'Seleccionar Fecha';
+
+  @override
+  String get error_enter_number => 'Por favor, ingrese el número de la colmena';
+
+  @override
+  String get error_invalid_number => 'Por favor, ingrese un número válido';
+
+  @override
+  String get hive_saved_success => 'Colmena guardada con éxito';
+
+  @override
+  String get error_login_required => 'Error: Se requiere iniciar sesión';
+
+  @override
+  String get status_queenless => 'Huérfana';
+
+  @override
+  String get status_split => 'Dividida';
+
+  @override
+  String get status_merged => 'Fusionada';
+
+  @override
+  String get hive_frames_distribution => 'Distribución de Cuadros';
+
+  @override
+  String get error_invalid_value => 'Valor inválido';
+
+  @override
+  String get select_hive => 'Seleccionar Colmena';
+
+  @override
+  String get select_hive_placeholder => 'Seleccione una colmena';
+
+  @override
+  String get inspection_date => 'Fecha de Inspección';
+
+  @override
+  String get brood_status => 'Estado de la Cría';
+
+  @override
+  String get select_brood_status_placeholder =>
+      'Seleccione el estado de la cría';
+
+  @override
+  String get environmental_data => 'Datos Ambientales';
+
+  @override
+  String get overall_status => 'Estado General';
+
+  @override
+  String get select_overall_status_placeholder =>
+      'Seleccione el estado general';
+
+  @override
+  String get detected_issues => 'Problemas Detectados';
+
+  @override
+  String get select_issues_placeholder => 'Seleccione los problemas detectados';
+
+  @override
+  String get notes_placeholder => 'Escriba sus notas aquí...';
+
+  @override
+  String get error_select_hive => 'Por favor, seleccione una colmena primero';
+
+  @override
+  String get inspection_saved_success => 'Inspección guardada con éxito';
+
+  @override
+  String get error_saving_inspection =>
+      'Ocurrió un error al guardar la inspección';
 }

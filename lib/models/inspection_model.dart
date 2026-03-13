@@ -1,13 +1,14 @@
 // تم حذف 'package:cloud_firestore/cloud_firestore.dart'
 
 // Enums to ensure data consistency
-enum HiveHealth { strong, moderate, weak }
-enum QueenPresence { present, absent, unseen }
-enum BroodPattern { good, spotty, poor }
+// --- *** تم تعديل هذه الـ Enums لتطابق الكود المستخدم *** ---
+enum HiveHealth { strong, average, weak } // تم إرجاع average
+enum QueenPresence { present, absent, newQueen, unseen } // تم إضافة newQueen و unseen
+enum BroodPattern { good, spotty, poor, none } // تم إضافة none
 enum Temperament { calm, nervous, aggressive }
 enum InspectionIssue {
   varroa,
-  smallHiveBeetle,
+  smallHiveBeetle, // تم التأكد من وجوده
   waxMoth,
   americanFoulbrood,
   europeanFoulbrood,
@@ -17,7 +18,10 @@ enum InspectionIssue {
   queenIssues,
   robbing,
   pesticidePoisoning,
-  other
+  other,
+  foulbrood, // تم إضافته
+  queenless, // تم إضافته
+  swarming, // تم إضافته
 }
 
 class InspectionModel {
@@ -95,7 +99,7 @@ class InspectionModel {
       inspectorName: map['inspector_name'],
       hiveHealth: HiveHealth.values.firstWhere(
             (e) => e.name == map['hive_health'],
-        orElse: () => HiveHealth.moderate,
+        orElse: () => HiveHealth.average, // تم التغيير إلى average
       ),
       temperament: Temperament.values.firstWhere(
             (e) => e.name == map['temperament'],
@@ -125,7 +129,7 @@ class InspectionModel {
       customFields: map['custom_fields'] != null ? Map<String, dynamic>.from(map['custom_fields']) : null,
     );
   }
-  
+
   // دالة بديلة، للتوافق مع الاصطلاح الجديد
   factory InspectionModel.fromSupabase(Map<String, dynamic> data) {
     return InspectionModel.fromMap(data);

@@ -42,8 +42,14 @@ class _HiveListScreenState extends State<HiveListScreen> {
     return Consumer<HiveProvider>(
       builder: (context, provider, child) {
         final hives = provider.getFilteredHives(widget.filter);
+        // --- تعديل: إضافة خلفية الصورة ---
         return Container(
-          decoration: AppTheme.gradientDecoration,
+          decoration: const BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage("assets/images/honey_background.png"),
+              fit: BoxFit.cover,
+            ),
+          ),
           child: Column(
             children: [
               _buildSearchField(l10n, provider),
@@ -57,23 +63,31 @@ class _HiveListScreenState extends State<HiveListScreen> {
     );
   }
 
+  // --- تعديل: تحسين تصميم حقل البحث ---
   Widget _buildSearchField(AppLocalizations l10n, HiveProvider provider) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-      child: TextField(
-        controller: _searchController,
-        decoration: InputDecoration(
-          hintText: '${l10n.search}...',
-          prefixIcon: const Icon(Icons.search),
-          suffixIcon: provider.searchQuery.isNotEmpty
-              ? IconButton(
-            icon: const Icon(Icons.clear),
-            onPressed: () => _searchController.clear(),
-          )
-              : null,
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-          filled: true,
-          fillColor: Colors.white,
+      child: Card(
+        elevation: 4,
+        shadowColor: Colors.black.withAlpha(100),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        child: TextField(
+          controller: _searchController,
+          style: const TextStyle(fontSize: 16),
+          decoration: InputDecoration(
+            hintText: '${l10n.search}...',
+            prefixIcon: const Icon(Icons.search, color: AppTheme.darkBrown),
+            suffixIcon: provider.searchQuery.isNotEmpty
+                ? IconButton(
+              icon: const Icon(Icons.clear, color: Colors.grey),
+              onPressed: () => _searchController.clear(),
+            )
+                : null,
+            border: InputBorder.none,
+            filled: true,
+            fillColor: Colors.white.withAlpha(200),
+            contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+          ),
         ),
       ),
     );
@@ -90,7 +104,7 @@ class _HiveListScreenState extends State<HiveListScreen> {
       onRefresh: () => provider.fetchHives(),
       color: AppTheme.primaryYellow,
       child: ListView.builder(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
+        padding: const EdgeInsets.all(16),
         itemCount: hives.length,
         itemBuilder: (context, index) {
           final hive = hives[index];
@@ -100,30 +114,92 @@ class _HiveListScreenState extends State<HiveListScreen> {
     );
   }
 
+  // --- تعديل: إعادة تصميم بطاقة الخلية بالكامل ---
   Widget _buildHiveCard(BuildContext context, HiveModel hive, AppLocalizations l10n) {
+    final statusColor = _getStatusColor(hive.status);
     return Card(
-      margin: const EdgeInsets.only(bottom: 12),
+      elevation: 8,
+      shadowColor: Colors.black.withAlpha(128), // ظل أسود غامق
+      color: Colors.white.withAlpha(230), // خلفية بيضاء شبه شفافة
+      margin: const EdgeInsets.only(bottom: 16),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: InkWell(
         onTap: () => widget.onHiveTap(hive.id, hive.hiveNumber, hive.isNucleus),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+        borderRadius: BorderRadius.circular(16),
+        child: IntrinsicHeight(
+          child: Row(
             children: [
-              Text(
-                '${hive.isNucleus ? 'طرد' : 'خلية'} رقم: ${hive.hiveNumber}',
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: AppTheme.darkBrown,
+              Container(
+                width: 10,
+                decoration: BoxDecoration(
+                  color: statusColor,
+                  borderRadius: const BorderRadius.only(
+                    topRight: Radius.circular(16),
+                    bottomRight: Radius.circular(16),
+                  ),
                 ),
               ),
-              const SizedBox(height: 8),
-              Text(
-                'تاريخ التركيب: ${hive.createdDate.day}/${hive.createdDate.month}/${hive.createdDate.year}',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey[600],
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(
+                            hive.isNucleus ? Icons.egg_outlined : Icons.hive_outlined,
+                            color: AppTheme.darkBrown,
+                            size: 28,
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              '${hive.isNucleus ? 'طرد' : 'خلية'} رقم: ${hive.hiveNumber}',
+                              style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: AppTheme.darkBrown,
+                              ),
+                            ),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: statusColor.withAlpha(50),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Text(
+                              hive.statusDisplayName,
+                              style: TextStyle(
+                                color: statusColor,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const Divider(height: 24),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          _buildInfoChip(
+                            icon: Icons.layers,
+                            text: '${hive.frameCount} إطارات',
+                          ),
+                          _buildInfoChip(
+                            icon: Icons.female,
+                            text: hive.queenStatusDisplayName,
+                          ),
+                          _buildInfoChip(
+                            icon: Icons.calendar_today_outlined,
+                            text: '${hive.createdDate.day}/${hive.createdDate.month}',
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],
@@ -133,7 +209,78 @@ class _HiveListScreenState extends State<HiveListScreen> {
     );
   }
 
+  Widget _buildInfoChip({required IconData icon, required String text}) {
+    return Row(
+      children: [
+        Icon(icon, size: 16, color: Colors.grey.shade700),
+        const SizedBox(width: 6),
+        Text(
+          text,
+          style: TextStyle(
+            fontSize: 14,
+            color: Colors.grey.shade800,
+          ),
+        ),
+      ],
+    );
+  }
+
+  // --- تعديل: تحسين تصميم الحالة الفارغة ---
   Widget _buildEmptyState(BuildContext context, AppLocalizations l10n) {
-    return const Center(child: Text('لا توجد خلايا'));
+    return Center(
+      child: Container(
+        padding: const EdgeInsets.all(32),
+        margin: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white.withAlpha(200),
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.search_off,
+              size: 80,
+              color: Colors.grey.shade500,
+            ),
+            const SizedBox(height: 24),
+            Text(
+              'لا توجد خلايا',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                color: Colors.grey.shade800,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'قم بإضافة خليتك الأولى للبدء في تتبع منحلك',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.grey.shade600,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Color _getStatusColor(HiveStatus status) {
+    switch (status) {
+      case HiveStatus.active:
+        return AppTheme.successColor;
+      case HiveStatus.weak:
+        return Colors.orange;
+      case HiveStatus.sick:
+      case HiveStatus.queenless:
+        return AppTheme.errorColor;
+      case HiveStatus.dead:
+        return Colors.black54;
+      default:
+        return Colors.grey;
+    }
   }
 }

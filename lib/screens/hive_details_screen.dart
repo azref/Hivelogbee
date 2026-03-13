@@ -4,28 +4,30 @@ import '../models/hive_model.dart';
 import '../providers/hive_provider.dart';
 import '../utils/app_theme.dart';
 import '../l10n/app_localizations.dart';
+import 'inspection_list_screen.dart'; // --- 1. استيراد الشاشة الجديدة ---
 
-// --- 1. تعريف الشاشات الفرعية كـ Placeholders ---
-// تم نقل كل دوال الـ build المساعدة إلى هنا لتنظيم الكود
+// --- تم تعديل هذا الكلاس بالكامل ---
 class HiveOverviewTab extends StatelessWidget {
   final HiveModel hive;
   const HiveOverviewTab({super.key, required this.hive});
 
   @override
   Widget build(BuildContext context) {
+    // --- تعديل: إضافة بطاقة الملاحظات ---
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildInfoSection(hive),
-          const SizedBox(height: 16),
-          _buildLocationSection(context, hive),
-          const SizedBox(height: 16),
+          const SizedBox(height: 24),
           _buildQueenSection(hive),
-          const SizedBox(height: 16),
+          const SizedBox(height: 24),
           _buildFramesSection(hive),
-          const SizedBox(height: 16),
+          const SizedBox(height: 24),
+          // --- تعديل: إضافة قسم الملاحظات هنا ---
+          _buildNotesSection(hive),
+          const SizedBox(height: 24),
           _buildRelationshipsSection(hive),
           const SizedBox(height: 100),
         ],
@@ -33,59 +35,37 @@ class HiveOverviewTab extends StatelessWidget {
     );
   }
 
+  // --- تعديل: إزالة الملاحظات من هذه البطاقة ---
   Widget _buildInfoSection(HiveModel hive) {
     return _buildCard(
       title: 'معلومات عامة',
+      icon: Icons.info_outline,
       child: Column(
         children: [
           _buildInfoRow('تاريخ التركيب', _formatDate(hive.createdDate)),
           _buildInfoRow('آخر فحص', _formatDate(hive.lastInspection)),
           _buildInfoRow('عدد الفحوصات', 'N/A'),
           _buildInfoRow('العلاجات النشطة', 'N/A'),
-          if (hive.notes != null && hive.notes!.isNotEmpty)
-            _buildInfoRow('الملاحظات', hive.notes!),
         ],
       ),
     );
   }
 
-  Widget _buildLocationSection(BuildContext context, HiveModel hive) {
+  // --- تعديل: إضافة دالة جديدة لبطاقة الملاحظات ---
+  Widget _buildNotesSection(HiveModel hive) {
+    if (hive.notes == null || hive.notes!.isEmpty) {
+      return const SizedBox.shrink();
+    }
     return _buildCard(
-      title: 'الموقع',
-      child: Column(
-        children: [
-          if (hive.location != null) _buildInfoRow('المنطقة', hive.location!),
-          if (hive.latitude != null && hive.longitude != null)
-            _buildInfoRow('الإحداثيات', '${hive.latitude}, ${hive.longitude}'),
-          const SizedBox(height: 16),
-          Container(
-            width: double.infinity,
-            height: 50,
-            decoration: BoxDecoration(
-              color: AppTheme.primaryYellow.withAlpha(25),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: AppTheme.primaryYellow),
-            ),
-            child: InkWell(
-              onTap: () => _openMap(context),
-              borderRadius: BorderRadius.circular(12),
-              child: const Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.map, color: AppTheme.primaryYellow),
-                  SizedBox(width: 8),
-                  Text(
-                    'عرض على الخريطة',
-                    style: TextStyle(
-                      color: AppTheme.primaryYellow,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
+      title: 'الملاحظات',
+      icon: Icons.note_alt_outlined,
+      child: Text(
+        hive.notes!,
+        style: const TextStyle(
+          fontSize: 16,
+          color: AppTheme.darkBrown,
+          height: 1.5, // لزيادة التباعد بين السطور
+        ),
       ),
     );
   }
@@ -93,6 +73,7 @@ class HiveOverviewTab extends StatelessWidget {
   Widget _buildQueenSection(HiveModel hive) {
     return _buildCard(
       title: 'معلومات الملكة',
+      icon: Icons.female,
       child: Column(
         children: [
           _buildInfoRow('الحالة', hive.queenStatusDisplayName),
@@ -105,15 +86,9 @@ class HiveOverviewTab extends StatelessWidget {
   Widget _buildFramesSection(HiveModel hive) {
     return _buildCard(
       title: 'توزيع الإطارات',
+      icon: Icons.layers,
       child: Column(
         children: [
-          _buildFrameBar(
-            label: 'إطارات العسل',
-            count: hive.honeyFrames,
-            total: hive.frameCount,
-            color: AppTheme.honeyOrange,
-          ),
-          const SizedBox(height: 12),
           _buildFrameBar(
             label: 'إطارات الحضنة',
             count: hive.broodFrames,
@@ -121,13 +96,43 @@ class HiveOverviewTab extends StatelessWidget {
             color: AppTheme.primaryYellow,
           ),
           const SizedBox(height: 16),
+          _buildFrameBar(
+            label: 'إطارات العسل',
+            count: hive.honeyFrames,
+            total: hive.frameCount,
+            color: AppTheme.honeyOrange,
+          ),
+          const SizedBox(height: 16),
+          _buildFrameBar(
+            label: 'إطارات حبوب اللقاح',
+            count: hive.pollenFrames,
+            total: hive.frameCount,
+            color: Colors.green,
+          ),
+          const SizedBox(height: 16),
+          _buildFrameBar(
+            label: 'إطارات فارغة',
+            count: hive.emptyFrames,
+            total: hive.frameCount,
+            color: Colors.grey.shade400,
+          ),
+          const Divider(height: 24),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
+              const Text(
+                'إجمالي الإطارات',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: AppTheme.darkBrown,
+                ),
+              ),
               Text(
-                'إجمالي الإطارات: ${hive.frameCount}',
+                '${hive.frameCount}',
                 style: const TextStyle(
-                  fontWeight: FontWeight.w600,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
                   color: AppTheme.darkBrown,
                 ),
               ),
@@ -154,34 +159,28 @@ class HiveOverviewTab extends StatelessWidget {
             Text(
               label,
               style: const TextStyle(
+                fontSize: 16,
                 fontWeight: FontWeight.w600,
                 color: AppTheme.darkBrown,
               ),
             ),
             Text(
-              '$count من $total',
+              '$count',
               style: TextStyle(
+                fontSize: 16,
                 color: AppTheme.darkBrown.withAlpha(178),
               ),
             ),
           ],
         ),
         const SizedBox(height: 8),
-        Container(
-          height: 8,
-          decoration: BoxDecoration(
-            color: Colors.grey.shade200,
-            borderRadius: BorderRadius.circular(4),
-          ),
-          child: FractionallySizedBox(
-            alignment: Alignment.centerLeft,
-            widthFactor: percentage,
-            child: Container(
-              decoration: BoxDecoration(
-                color: color,
-                borderRadius: BorderRadius.circular(4),
-              ),
-            ),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(10),
+          child: LinearProgressIndicator(
+            value: percentage,
+            minHeight: 12,
+            backgroundColor: Colors.grey.shade300,
+            color: color,
           ),
         ),
       ],
@@ -194,6 +193,7 @@ class HiveOverviewTab extends StatelessWidget {
     }
     return _buildCard(
       title: 'العلاقات الأسرية',
+      icon: Icons.family_restroom,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -229,13 +229,14 @@ class HiveOverviewTab extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 16, color: color),
+          Icon(icon, size: 20, color: color),
           const SizedBox(width: 8),
           Text(
             label,
             style: TextStyle(
               color: color,
               fontWeight: FontWeight.w600,
+              fontSize: 16,
             ),
           ),
         ],
@@ -245,35 +246,37 @@ class HiveOverviewTab extends StatelessWidget {
 
   Widget _buildCard({
     required String title,
+    required IconData icon,
     required Widget child,
   }) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withAlpha(12),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            title,
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: AppTheme.darkBrown,
+    return Card(
+      elevation: 8,
+      shadowColor: Colors.black.withAlpha(128),
+      color: Colors.white.withAlpha(217),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(icon, color: AppTheme.darkBrown, size: 24),
+                const SizedBox(width: 12),
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: AppTheme.darkBrown,
+                  ),
+                ),
+              ],
             ),
-          ),
-          const SizedBox(height: 16),
-          child,
-        ],
+            const Divider(height: 24),
+            child,
+          ],
+        ),
       ),
     );
   }
@@ -285,10 +288,11 @@ class HiveOverviewTab extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(
-            width: 100,
+            width: 120,
             child: Text(
               '$label:',
               style: TextStyle(
+                fontSize: 16,
                 fontWeight: FontWeight.w600,
                 color: AppTheme.darkBrown.withAlpha(178),
               ),
@@ -298,6 +302,7 @@ class HiveOverviewTab extends StatelessWidget {
             child: Text(
               value,
               style: const TextStyle(
+                fontSize: 16,
                 color: AppTheme.darkBrown,
               ),
             ),
@@ -310,18 +315,10 @@ class HiveOverviewTab extends StatelessWidget {
   String _formatDate(DateTime date) {
     return '${date.day}/${date.month}/${date.year}';
   }
-
-  void _openMap(BuildContext context) {
-    // Handle map opening
-  }
 }
 
-class HiveInspectionsTab extends StatelessWidget {
-  final HiveModel hive;
-  const HiveInspectionsTab({super.key, required this.hive});
-  @override
-  Widget build(BuildContext context) => Center(child: Text('فحوصات الخلية: ${hive.hiveNumber}'));
-}
+// --- تم حذف الكلاس القديم ---
+// class HiveInspectionsTab extends StatelessWidget { ... }
 
 class HiveTreatmentsTab extends StatelessWidget {
   final HiveModel hive;
@@ -341,7 +338,7 @@ class HiveProductionTab extends StatelessWidget {
 class HiveDetailsScreen extends StatefulWidget {
   final String hiveId;
   final String activeTabId;
-  final Function(String, HiveModel) onActionSelected; // <-- 2. استقبال دالة الإجراءات
+  final Function(String, HiveModel) onActionSelected;
 
   const HiveDetailsScreen({
     super.key,
@@ -375,85 +372,89 @@ class _HiveDetailsScreenState extends State<HiveDetailsScreen> {
           );
         }
 
-        // --- 3. استخدام Stack لوضع القائمة المنسدلة فوق المحتوى ---
-        return Stack(
-          children: [
-            // --- المحتوى الرئيسي ---
-            NestedScrollView(
-              headerSliverBuilder: (context, innerBoxIsScrolled) {
-                return [
-                  SliverToBoxAdapter(
-                    child: _buildHiveHeader(hive!),
-                  ),
-                ];
-              },
-              body: Container(
-                decoration: AppTheme.gradientDecoration,
-                child: IndexedStack(
+        return Container(
+          decoration: const BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage("assets/images/honey_background.png"),
+              fit: BoxFit.cover,
+            ),
+          ),
+          child: Stack(
+            children: [
+              NestedScrollView(
+                headerSliverBuilder: (context, innerBoxIsScrolled) {
+                  return [
+                    SliverToBoxAdapter(
+                      child: _buildHiveHeader(hive!),
+                    ),
+                  ];
+                },
+                // --- 2. تعديل IndexedStack ---
+                body: IndexedStack(
                   index: _getTabIndex(widget.activeTabId),
                   children: [
                     HiveOverviewTab(hive: hive),
-                    HiveInspectionsTab(hive: hive),
+                    // استبدال الكلاس القديم بالشاشة الجديدة
+                    InspectionListScreen(hiveId: hive.id),
                     HiveTreatmentsTab(hive: hive),
                     HiveProductionTab(hive: hive),
                   ],
                 ),
               ),
-            ),
-            // --- 4. وضع القائمة المنسدلة في الأعلى ---
-            Positioned(
-              top: 0,
-              left: 0, // في أقصى اليسار
-              child: SafeArea(
-                child: PopupMenuButton<String>(
-                  icon: const Icon(Icons.more_vert, color: Colors.white), // لون الأيقونة
-                  onSelected: (action) => widget.onActionSelected(action, hive!),
-                  itemBuilder: (context) => [
-                    PopupMenuItem(
-                      value: 'inspect',
-                      child: Row(
-                        children: [
-                          const Icon(Icons.search, size: 20),
-                          const SizedBox(width: 8),
-                          Text(l10n.add_inspection),
-                        ],
+              Positioned(
+                top: 0,
+                left: 0,
+                child: SafeArea(
+                  child: PopupMenuButton<String>(
+                    icon: const Icon(Icons.more_vert, color: Colors.white),
+                    onSelected: (action) => widget.onActionSelected(action, hive!),
+                    itemBuilder: (context) => [
+                      PopupMenuItem(
+                        value: 'inspect',
+                        child: Row(
+                          children: [
+                            const Icon(Icons.search, size: 20),
+                            const SizedBox(width: 8),
+                            Text(l10n.add_inspection),
+                          ],
+                        ),
                       ),
-                    ),
-                    PopupMenuItem(
-                      value: 'treat',
-                      child: Row(
-                        children: [
-                          const Icon(Icons.medical_services, size: 20),
-                          const SizedBox(width: 8),
-                          Text(l10n.add_treatment),
-                        ],
+                      PopupMenuItem(
+                        value: 'treat',
+                        child: Row(
+                          children: [
+                            const Icon(Icons.medical_services, size: 20),
+                            const SizedBox(width: 8),
+                            Text(l10n.add_treatment),
+                          ],
+                        ),
                       ),
-                    ),
-                    PopupMenuItem(
-                      value: 'split',
-                      child: const Row(
-                        children: [
-                          Icon(Icons.call_split, size: 20),
-                          SizedBox(width: 8),
-                          Text('تقسيم الخلية'),
-                        ],
+                      PopupMenuItem(
+                        value: 'split',
+                        child: const Row(
+                          children: [
+                            Icon(Icons.call_split, size: 20),
+                            SizedBox(width: 8),
+                            Text('تقسيم الخلية'),
+                          ],
+                        ),
                       ),
-                    ),
-                    PopupMenuItem(
-                      value: 'edit',
-                      child: Row(
-                        children: [
-                          const Icon(Icons.edit, size: 20),
-                          const SizedBox(width: 8),
-                          Text(l10n.edit),
-                        ],
+                      PopupMenuItem(
+                        value: 'edit',
+                        child: Row(
+                          children: [
+                            const Icon(Icons.edit, size: 20),
+                            const SizedBox(width: 8),
+                            Text(l10n.edit),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         );
       },
     );
@@ -518,14 +519,13 @@ class _HiveDetailsScreenState extends State<HiveDetailsScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                // في دالة _buildHiveHeader
-                Text(
-                '${hive.isNucleus ? 'طرد' : 'خلية'} رقم ${hive.hiveNumber}',
-                  style: const TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
+                    Text(
+                      '${hive.isNucleus ? 'طرد' : 'خلية'} رقم ${hive.hiveNumber}',
+                      style: const TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
                     ),
                     const SizedBox(height: 4),
                     Text(

@@ -96,10 +96,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get frame_count => 'عدد الإطارات';
 
   @override
-  String get honey_frames => 'إطارات العسل';
+  String get honey_frames => 'إطارات عسل';
 
   @override
-  String get brood_frames => 'إطارات الحضنة';
+  String get brood_frames => 'إطارات حضنة';
 
   @override
   String get save => 'حفظ';
@@ -235,4 +235,148 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get viewDetails => 'عرض التفاصيل';
+
+  @override
+  String get basic_info => 'المعلومات الأساسية';
+
+  @override
+  String get hive_type => 'نوع الخلية';
+
+  @override
+  String get full_hive => 'خلية كاملة';
+
+  @override
+  String get nucleus_hive => 'طرد (نويّة)';
+
+  @override
+  String get installation_date => 'تاريخ التركيب';
+
+  @override
+  String get map_location => 'تحديد الموقع من الخريطة';
+
+  @override
+  String get bee_breed => 'سلالة النحل';
+
+  @override
+  String get status_active => 'نشطة';
+
+  @override
+  String get status_weak => 'ضعيفة';
+
+  @override
+  String get status_sick => 'مريضة';
+
+  @override
+  String get status_dead => 'ميتة';
+
+  @override
+  String get status_swarmed => 'مطردة';
+
+  @override
+  String get queen_present => 'موجودة';
+
+  @override
+  String get queen_absent => 'غير موجودة';
+
+  @override
+  String get queen_isNew => 'عذراء';
+
+  @override
+  String get queen_old => 'قديمة';
+
+  @override
+  String get queen_marked => 'معلمة';
+
+  @override
+  String get queen_unmarked => 'غير معلمة';
+
+  @override
+  String get breed_carniolan => 'كرنيولي';
+
+  @override
+  String get breed_italian => 'إيطالي';
+
+  @override
+  String get breed_caucasian => 'قوقازي';
+
+  @override
+  String get breed_buckfast => 'بكفاست';
+
+  @override
+  String get breed_local => 'محلي';
+
+  @override
+  String get breed_hybrid => 'هجين';
+
+  @override
+  String get select_date => 'اختر التاريخ';
+
+  @override
+  String get error_enter_number => 'يرجى إدخال رقم الخلية';
+
+  @override
+  String get error_invalid_number => 'يرجى إدخال رقم صحيح';
+
+  @override
+  String get hive_saved_success => 'تم حفظ الخلية بنجاح';
+
+  @override
+  String get error_login_required => 'خطأ: يجب تسجيل الدخول أولاً';
+
+  @override
+  String get status_queenless => 'يتيمة (بدون ملكة)';
+
+  @override
+  String get status_split => 'مقسومة';
+
+  @override
+  String get status_merged => 'مضمومة';
+
+  @override
+  String get hive_frames_distribution => 'توزيع الإطارات';
+
+  @override
+  String get error_invalid_value => 'قيمة غير صالحة';
+
+  @override
+  String get select_hive => 'اختيار الخلية';
+
+  @override
+  String get select_hive_placeholder => 'اختر خلية';
+
+  @override
+  String get inspection_date => 'تاريخ الفحص';
+
+  @override
+  String get brood_status => 'حالة الحضنة';
+
+  @override
+  String get select_brood_status_placeholder => 'اختر حالة الحضنة';
+
+  @override
+  String get environmental_data => 'البيانات البيئية';
+
+  @override
+  String get overall_status => 'الحالة العامة';
+
+  @override
+  String get select_overall_status_placeholder => 'اختر الحالة العامة';
+
+  @override
+  String get detected_issues => 'المشاكل المكتشفة';
+
+  @override
+  String get select_issues_placeholder => 'اختر المشاكل المكتشفة';
+
+  @override
+  String get notes_placeholder => 'اكتب ملاحظاتك هنا...';
+
+  @override
+  String get error_select_hive => 'يرجى اختيار خلية أولاً';
+
+  @override
+  String get inspection_saved_success => 'تم حفظ الفحص بنجاح';
+
+  @override
+  String get error_saving_inspection => 'حدث خطأ أثناء حفظ الفحص';
 }

@@ -39,6 +39,9 @@ class HiveModel {
   final int frameCount;
   final int broodFrames;
   final int honeyFrames;
+  // --- تعديل: إضافة الحقول الجديدة ---
+  final int pollenFrames;
+  final int emptyFrames;
   final String? notes;
   final String? location;
   final double? latitude;
@@ -61,6 +64,9 @@ class HiveModel {
     required this.frameCount,
     required this.broodFrames,
     required this.honeyFrames,
+    // --- تعديل: إضافة الحقول الجديدة للكونستركتور ---
+    required this.pollenFrames,
+    required this.emptyFrames,
     this.notes,
     this.location,
     this.latitude,
@@ -78,7 +84,6 @@ class HiveModel {
   String get type => isNucleus ? 'nucleus' : 'hive';
   DateTime get lastInspectionDate => lastInspection;
 
-  // --- *** هذا هو الجزء الذي تم تعديله *** ---
   Map<String, dynamic> toMap() {
     final map = {
       'user_id': userId,
@@ -90,6 +95,9 @@ class HiveModel {
       'frame_count': frameCount,
       'brood_frames': broodFrames,
       'honey_frames': honeyFrames,
+      // --- تعديل: إضافة الحقول الجديدة لدالة toMap ---
+      'pollen_frames': pollenFrames,
+      'empty_frames': emptyFrames,
       'notes': notes,
       'location': location,
       'latitude': latitude,
@@ -102,17 +110,13 @@ class HiveModel {
       'custom_fields': customFields,
     };
 
-    // لا تقم بإضافة الـ id إلى الخريطة إلا إذا كان له قيمة
-    // هذا يسمح لـ Supabase بإنشاء ID جديد عند الإضافة
     if (id.isNotEmpty) {
       map['id'] = id;
     }
 
     return map;
   }
-  // --- *** نهاية الجزء المعدل *** ---
 
-  // إنشاء نموذج من Map قادم من Supabase
   factory HiveModel.fromMap(Map<String, dynamic> map) {
     String queenStatusString = map['queen_status'] ?? 'present';
     if (queenStatusString == 'new') {
@@ -139,6 +143,9 @@ class HiveModel {
       frameCount: map['frame_count'] ?? 0,
       broodFrames: map['brood_frames'] ?? 0,
       honeyFrames: map['honey_frames'] ?? 0,
+      // --- تعديل: إضافة الحقول الجديدة لدالة fromMap ---
+      pollenFrames: map['pollen_frames'] ?? 0,
+      emptyFrames: map['empty_frames'] ?? 0,
       notes: map['notes'],
       location: map['location'],
       latitude: map['latitude']?.toDouble(),
@@ -154,12 +161,10 @@ class HiveModel {
     );
   }
 
-  // دالة بديلة لـ fromFirestore، للتوافق مع الاصطلاح الجديد
   factory HiveModel.fromSupabase(Map<String, dynamic> data) {
     return HiveModel.fromMap(data);
   }
 
-  // Create a copy with updated fields
   HiveModel copyWith({
     String? id,
     String? userId,
@@ -171,6 +176,9 @@ class HiveModel {
     int? frameCount,
     int? broodFrames,
     int? honeyFrames,
+    // --- تعديل: إضافة الحقول الجديدة لدالة copyWith ---
+    int? pollenFrames,
+    int? emptyFrames,
     String? notes,
     String? location,
     double? latitude,
@@ -193,6 +201,9 @@ class HiveModel {
       frameCount: frameCount ?? this.frameCount,
       broodFrames: broodFrames ?? this.broodFrames,
       honeyFrames: honeyFrames ?? this.honeyFrames,
+      // --- تعديل: إضافة الحقول الجديدة لدالة copyWith ---
+      pollenFrames: pollenFrames ?? this.pollenFrames,
+      emptyFrames: emptyFrames ?? this.emptyFrames,
       notes: notes ?? this.notes,
       location: location ?? this.location,
       latitude: latitude ?? this.latitude,

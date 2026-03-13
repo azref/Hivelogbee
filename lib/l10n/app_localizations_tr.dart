@@ -12,163 +12,164 @@ class AppLocalizationsTr extends AppLocalizations {
   String get appName => 'HiveLog Bee';
 
   @override
-  String get appSubtitle => 'Smart Beekeeping Management';
+  String get appSubtitle => 'Akıllı Arılık Yönetimi';
 
   @override
-  String get login => 'Login';
+  String get login => 'Giriş Yap';
 
   @override
-  String get register => 'Create New Account';
+  String get register => 'Yeni Hesap Oluştur';
 
   @override
-  String get email => 'Email';
+  String get email => 'E-posta';
 
   @override
-  String get password => 'Password';
+  String get password => 'Şifre';
 
   @override
-  String get confirm_password => 'Confirm Password';
+  String get confirm_password => 'Şifreyi Onayla';
 
   @override
-  String get full_name => 'Full Name';
+  String get full_name => 'Tam Ad';
 
   @override
-  String get forgot_password => 'Forgot Password?';
+  String get forgot_password => 'Şifreni mi unuttun?';
 
   @override
-  String get remember_me => 'Remember Me';
+  String get remember_me => 'Beni Hatırla';
 
   @override
-  String get accept_terms => 'I agree to Terms of Service and Privacy Policy';
+  String get accept_terms =>
+      'Hizmet Şartları ve Gizlilik Politikasını kabul ediyorum';
 
   @override
-  String get home => 'Home';
+  String get home => 'Anasayfa';
 
   @override
-  String get hives => 'Hives';
+  String get hives => 'Kovanlar';
 
   @override
-  String get inspections => 'Inspections';
+  String get inspections => 'Denetimler';
 
   @override
-  String get treatments => 'Treatments';
+  String get treatments => 'Tedaviler';
 
   @override
-  String get production => 'Production';
+  String get production => 'Üretim';
 
   @override
-  String get reminders => 'Reminders';
+  String get reminders => 'Hatırlatıcılar';
 
   @override
-  String get knowledge => 'Knowledge';
+  String get knowledge => 'Bilgi';
 
   @override
-  String get settings => 'Settings';
+  String get settings => 'Ayarlar';
 
   @override
-  String get profile => 'Profile';
+  String get profile => 'Profil';
 
   @override
-  String get statistics => 'Statistics';
+  String get statistics => 'İstatistikler';
 
   @override
-  String get weather => 'Weather';
+  String get weather => 'Hava Durumu';
 
   @override
-  String get add_hive => 'Add Hive';
+  String get add_hive => 'Kovan Ekle';
 
   @override
-  String get add_inspection => 'Add Inspection';
+  String get add_inspection => 'Denetim Ekle';
 
   @override
-  String get add_treatment => 'Add Treatment';
+  String get add_treatment => 'Tedavi Ekle';
 
   @override
-  String get hive_number => 'Hive Number';
+  String get hive_number => 'Kovan Numarası';
 
   @override
-  String get hive_status => 'Hive Status';
+  String get hive_status => 'Kovan Durumu';
 
   @override
-  String get queen_status => 'Queen Status';
+  String get queen_status => 'Ana Arı Durumu';
 
   @override
-  String get frame_count => 'Frame Count';
+  String get frame_count => 'Çerçeve Sayısı';
 
   @override
-  String get honey_frames => 'Honey Frames';
+  String get honey_frames => 'Bal Çerçeveleri';
 
   @override
-  String get brood_frames => 'Brood Frames';
+  String get brood_frames => 'Kuluçka Çerçeveleri';
 
   @override
-  String get save => 'Save';
+  String get save => 'Kaydet';
 
   @override
-  String get cancel => 'Cancel';
+  String get cancel => 'İptal';
 
   @override
-  String get delete => 'Delete';
+  String get delete => 'Sil';
 
   @override
-  String get edit => 'Edit';
+  String get edit => 'Düzenle';
 
   @override
-  String get search => 'Search';
+  String get search => 'Ara';
 
   @override
-  String get filter => 'Filter';
+  String get filter => 'Filtrele';
 
   @override
-  String get sort => 'Sort';
+  String get sort => 'Sırala';
 
   @override
-  String get date => 'Date';
+  String get date => 'Tarih';
 
   @override
-  String get notes => 'Notes';
+  String get notes => 'Notlar';
 
   @override
-  String get location => 'Location';
+  String get location => 'Konum';
 
   @override
-  String get temperature => 'Temperature';
+  String get temperature => 'Sıcaklık';
 
   @override
-  String get humidity => 'Humidity';
+  String get humidity => 'Nem';
 
   @override
-  String get wind_speed => 'Wind Speed';
+  String get wind_speed => 'Rüzgar Hızı';
 
   @override
-  String get language => 'Language';
+  String get language => 'Dil';
 
   @override
-  String get theme => 'Theme';
+  String get theme => 'Tema';
 
   @override
-  String get notifications => 'Notifications';
+  String get notifications => 'Bildirimler';
 
   @override
-  String get backup => 'Backup';
+  String get backup => 'Yedekleme';
 
   @override
-  String get about => 'About';
+  String get about => 'Hakkında';
 
   @override
-  String get logout => 'Logout';
+  String get logout => 'Çıkış Yap';
 
   @override
-  String get total_hives => 'Total Hives';
+  String get total_hives => 'Toplam Kovan';
 
   @override
-  String get total_production => 'Total Production';
+  String get total_production => 'Toplam Üretim';
 
   @override
-  String get active_treatments => 'Active Treatments';
+  String get active_treatments => 'Aktif Tedaviler';
 
   @override
-  String get pending_inspections => 'Pending Inspections';
+  String get pending_inspections => 'Bekleyen Denetimler';
 
   @override
   String get kg => 'kg';
@@ -180,59 +181,203 @@ class AppLocalizationsTr extends AppLocalizations {
   String get percent => '%';
 
   @override
-  String get kmh => 'km/h';
+  String get kmh => 'km/s';
 
   @override
-  String get light_mode => 'Light Mode';
+  String get light_mode => 'Açık Mod';
 
   @override
-  String get dark_mode => 'Dark Mode';
+  String get dark_mode => 'Karanlık Mod';
 
   @override
-  String get system_mode => 'System Mode';
+  String get system_mode => 'Sistem Modu';
 
   @override
-  String get push_notifications => 'Push Notifications';
+  String get push_notifications => 'Anlık Bildirimler';
 
   @override
-  String get email_notifications => 'Email Notifications';
+  String get email_notifications => 'E-posta Bildirimleri';
 
   @override
-  String get weather_alerts => 'Weather Alerts';
+  String get weather_alerts => 'Hava Durumu Uyarıları';
 
   @override
-  String get auto_backup => 'Auto Backup';
+  String get auto_backup => 'Otomatik Yedekleme';
 
   @override
-  String get offline_mode => 'Offline Mode';
+  String get offline_mode => 'Çevrimdışı Mod';
 
   @override
-  String get clear_cache => 'Clear Cache';
+  String get clear_cache => 'Önbelleği Temizle';
 
   @override
-  String get app_version => 'App Version';
+  String get app_version => 'Uygulama Sürümü';
 
   @override
-  String get contact_support => 'Contact Support';
+  String get contact_support => 'Destekle İletişime Geç';
 
   @override
-  String get rate_app => 'Rate App';
+  String get rate_app => 'Uygulamayı Değerlendir';
 
   @override
-  String get share_app => 'Share App';
+  String get share_app => 'Uygulamayı Paylaş';
 
   @override
-  String get privacy_policy => 'Privacy Policy';
+  String get privacy_policy => 'Gizlilik Politikası';
 
   @override
-  String get terms_of_service => 'Terms of Service';
+  String get terms_of_service => 'Hizmet Şartları';
 
   @override
-  String get mapScreenTitle => 'Map';
+  String get mapScreenTitle => 'Harita';
 
   @override
-  String get reports => 'Reports';
+  String get reports => 'Raporlar';
 
   @override
-  String get viewDetails => 'View Details';
+  String get viewDetails => 'Detayları Görüntüle';
+
+  @override
+  String get basic_info => 'Temel Bilgiler';
+
+  @override
+  String get hive_type => 'Kovan Tipi';
+
+  @override
+  String get full_hive => 'Tam Kovan';
+
+  @override
+  String get nucleus_hive => 'Rușet Kovan';
+
+  @override
+  String get installation_date => 'Kurulum Tarihi';
+
+  @override
+  String get map_location => 'Haritadan Konum Seç';
+
+  @override
+  String get bee_breed => 'Arı Irkı';
+
+  @override
+  String get status_active => 'Aktif';
+
+  @override
+  String get status_weak => 'Zayıf';
+
+  @override
+  String get status_sick => 'Hasta';
+
+  @override
+  String get status_dead => 'Ölü';
+
+  @override
+  String get status_swarmed => 'Oğul Vermiş';
+
+  @override
+  String get queen_present => 'Mevcut';
+
+  @override
+  String get queen_absent => 'Yok';
+
+  @override
+  String get queen_isNew => 'Bakire';
+
+  @override
+  String get queen_old => 'Yaşlı';
+
+  @override
+  String get queen_marked => 'İşaretli';
+
+  @override
+  String get queen_unmarked => 'İşaretsiz';
+
+  @override
+  String get breed_carniolan => 'Karniyol';
+
+  @override
+  String get breed_italian => 'İtalyan';
+
+  @override
+  String get breed_caucasian => 'Kafkas';
+
+  @override
+  String get breed_buckfast => 'Buckfast';
+
+  @override
+  String get breed_local => 'Yerli';
+
+  @override
+  String get breed_hybrid => 'Melez';
+
+  @override
+  String get select_date => 'Tarih Seç';
+
+  @override
+  String get error_enter_number => 'Lütfen kovan numarasını girin';
+
+  @override
+  String get error_invalid_number => 'Lütfen geçerli bir numara girin';
+
+  @override
+  String get hive_saved_success => 'Kovan başarıyla kaydedildi';
+
+  @override
+  String get error_login_required => 'Hata: Giriş yapılması gerekiyor';
+
+  @override
+  String get status_queenless => 'Anasız';
+
+  @override
+  String get status_split => 'Bölünmüş';
+
+  @override
+  String get status_merged => 'Birleştirilmiş';
+
+  @override
+  String get hive_frames_distribution => 'Çerçeve Dağılımı';
+
+  @override
+  String get error_invalid_value => 'Geçersiz değer';
+
+  @override
+  String get select_hive => 'Kovan Seç';
+
+  @override
+  String get select_hive_placeholder => 'Bir kovan seçin';
+
+  @override
+  String get inspection_date => 'Denetim Tarihi';
+
+  @override
+  String get brood_status => 'Kuluçka Durumu';
+
+  @override
+  String get select_brood_status_placeholder => 'Kuluçka durumunu seçin';
+
+  @override
+  String get environmental_data => 'Çevresel Veriler';
+
+  @override
+  String get overall_status => 'Genel Durum';
+
+  @override
+  String get select_overall_status_placeholder => 'Genel durumu seçin';
+
+  @override
+  String get detected_issues => 'Tespit Edilen Sorunlar';
+
+  @override
+  String get select_issues_placeholder => 'Tespit edilen sorunları seçin';
+
+  @override
+  String get notes_placeholder => 'Notlarınızı buraya yazın...';
+
+  @override
+  String get error_select_hive => 'Lütfen önce bir kovan seçin';
+
+  @override
+  String get inspection_saved_success => 'Denetim başarıyla kaydedildi';
+
+  @override
+  String get error_saving_inspection => 'Denetim kaydedilirken bir hata oluştu';
 }
