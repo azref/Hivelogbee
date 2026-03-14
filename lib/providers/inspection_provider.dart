@@ -55,7 +55,7 @@ class InspectionProvider extends ChangeNotifier {
     );
   }
 
-  // --- *** 3. تعديل دالة addInspection بالكامل لتطبيق الخطة الجديدة *** ---
+  // --- *** 3. تعديل دالة addInspection لإضافة الفحص محلياً فوراً *** ---
   Future<void> addInspection(InspectionModel inspection) async {
     try {
       _isLoading = true;
@@ -66,20 +66,25 @@ class InspectionProvider extends ChangeNotifier {
       await _inspectionService.addInspection(inspection);
       print('--- InspectionProvider: نجحت عملية RPC في الخادم. ---');
 
-      // الخطوة 2: جلب النسخة المحدثة من الخلية من الخادم
+      // الخطوة 2: إضافة الفحص إلى القائمة المحلية فوراً (بعد نجاح العملية في الخادم)
+      // نضيف الفحص في البداية لأن getInspectionsByHive تعيد الفحوصات مرتبة تنازلياً
+      _inspections.insert(0, inspection);
+      print('--- InspectionProvider: تم إضافة الفحص محلياً. عدد الفحوصات الآن: ${_inspections.length} ---');
+
+      // الخطوة 3: جلب النسخة المحدثة من الخلية من الخادم
       final updatedHive = await _hiveService.getHiveById(inspection.hiveId);
       if (updatedHive == null) {
         throw Exception('لم يتم العثور على الخلية بعد تحديثها.');
       }
       print('--- InspectionProvider: تم جلب الخلية المحدثة من الخادم. عدد الإطارات: ${updatedHive.frameCount} ---');
 
-      // الخطوة 3: إجبار HiveProvider على تحديث حالته بالخلية الجديدة
+      // الخطوة 4: إجبار HiveProvider على تحديث حالته بالخلية الجديدة
       final hiveProvider = Provider.of<HiveProvider>(context, listen: false);
       hiveProvider.forceUpdateHiveState(updatedHive);
 
-      // الـ stream الخاص بالفحوصات سيقوم بتحديث قائمة الفحوصات تلقائياً
+      // --- 4. إعلام جميع المستمعين (بما فيهم HiveListScreen) بالتحديث ---
       _isLoading = false;
-      // لا حاجة لـ notifyListeners() هنا لأن forceUpdateHiveState تقوم بذلك
+      notifyListeners(); // هذا هو المفتاح!
 
     } catch (e) {
       _error = e.toString();
@@ -124,7 +129,6 @@ class InspectionProvider extends ChangeNotifier {
   void setSearchQuery(String query) {
     if (_searchQuery != query) {
       _searchQuery = query;
-      // سنحتاج إلى تطبيق الفلترة هنا إذا أردنا البحث
       notifyListeners();
     }
   }
@@ -140,12 +144,9 @@ class InspectionProvider extends ChangeNotifier {
     _inspectionsSubscription?.cancel();
     super.dispose();
   }
-  // داخل كلاس InspectionProvider
 
   /// دالة مساعدة لفلترة الفحوصات الخاصة بخلية معينة من القائمة الكاملة.
   List<InspectionModel> getInspectionsByHive(String hiveId) {
-    // استخدام where لفلترة القائمة الرئيسية _inspections
     return _inspections.where((inspection) => inspection.hiveId == hiveId).toList();
   }
-
 }

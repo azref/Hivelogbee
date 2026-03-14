@@ -26,8 +26,7 @@ class _AddInspectionScreenState extends State<AddInspectionScreen> {
   final _honeyFramesController = TextEditingController(text: '0');
   final _pollenFramesController = TextEditingController(text: '0');
   final _emptyFramesController = TextEditingController(text: '0');
-
-  // حقول الشمع الجديدة
+  // --- 1. إضافة المتحكمين الجديدين ---
   final _foundationFramesController = TextEditingController(text: '0');
   final _drawnFramesController = TextEditingController(text: '0');
 
@@ -76,6 +75,9 @@ class _AddInspectionScreenState extends State<AddInspectionScreen> {
         _honeyFramesController.text = lastInspection.honeyFrames.toString();
         _pollenFramesController.text = lastInspection.pollenFrames.toString();
         _emptyFramesController.text = lastInspection.emptyFrames.toString();
+        // --- 2. إضافة تحميل القيم من آخر فحص ---
+        _foundationFramesController.text = lastInspection.foundationFrames.toString();
+        _drawnFramesController.text = lastInspection.drawnFrames.toString();
         _queenStatus = lastInspection.queenPresence;
         _broodPattern = lastInspection.broodPattern;
         _hiveHealth = lastInspection.hiveHealth;
@@ -86,6 +88,10 @@ class _AddInspectionScreenState extends State<AddInspectionScreen> {
         _honeyFramesController.text = hive.honeyFrames.toString();
         _pollenFramesController.text = hive.pollenFrames.toString();
         _emptyFramesController.text = hive.emptyFrames.toString();
+        // --- 3. إضافة القيم الافتراضية من الخلية (إذا كانت موجودة) ---
+        // حالياً الـ HiveModel لا يحتوي على هذين الحقلين، لذا نضع 0
+        _foundationFramesController.text = '0';
+        _drawnFramesController.text = '0';
         _notesController.text = hive.notes ?? '';
         _queenStatus = QueenPresence.present;
         _broodPattern = BroodPattern.good;
@@ -102,6 +108,7 @@ class _AddInspectionScreenState extends State<AddInspectionScreen> {
     _honeyFramesController.dispose();
     _pollenFramesController.dispose();
     _emptyFramesController.dispose();
+    // --- 4. إضافة التخلص من المتحكمين الجديدين ---
     _foundationFramesController.dispose();
     _drawnFramesController.dispose();
     super.dispose();
@@ -232,6 +239,7 @@ class _AddInspectionScreenState extends State<AddInspectionScreen> {
                           Expanded(child: _buildFrameInputField(_emptyFramesController, 'فارغة', Icons.check_box_outline_blank)),
                         ],
                       ),
+                      // --- 5. إضافة الحقلين الجديدين ---
                       const SizedBox(height: 12),
                       const Divider(),
                       const SizedBox(height: 8),
@@ -328,23 +336,18 @@ class _AddInspectionScreenState extends State<AddInspectionScreen> {
       controller: controller,
       keyboardType: TextInputType.number,
       textAlign: TextAlign.center,
-      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+      style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
       decoration: InputDecoration(
-        label: Center(
-          child: FittedBox(
-            fit: BoxFit.scaleDown,
-            child: Text(label, style: const TextStyle(fontFamily: 'Cairo')),
-          ),
-        ),
-        prefixIcon: Icon(icon, size: 20),
-        contentPadding: const EdgeInsets.symmetric(vertical: 8),
+        label: Center(child: Text(label)),
+        labelStyle: const TextStyle(fontSize: 16),
+        prefixIcon: Icon(icon, size: 24),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
         filled: true,
         fillColor: Colors.white.withAlpha(230),
       ),
       validator: (value) {
         if (value == null || int.tryParse(value) == null) {
-          return 'خطأ';
+          return 'قيمة غير صالحة';
         }
         return null;
       },
@@ -354,6 +357,7 @@ class _AddInspectionScreenState extends State<AddInspectionScreen> {
   Widget _buildActionChip(Map<String, dynamic> action, AppLocalizations l10n) {
     String label = 'إجراء غير معروف';
     switch (action['action']) {
+      case 'add_frames': label = 'أضاف ${action['count']} إطارات (${action['type'] == 'foundation' ? 'أساس' : 'ممطوط'})'; break;
       case 'add_feeding': label = 'أضاف تغذية ${action['amount']} (${action['type'] == 'sugar' ? 'سكري' : 'بروتين'})'; break;
       case 'add_super': label = 'أضاف عاسلة'; break;
       case 'remove_super': label = 'أزال عاسلة'; break;
@@ -444,6 +448,7 @@ class _AddInspectionScreenState extends State<AddInspectionScreen> {
       final honeyFrames = int.tryParse(_honeyFramesController.text) ?? 0;
       final pollenFrames = int.tryParse(_pollenFramesController.text) ?? 0;
       final emptyFrames = int.tryParse(_emptyFramesController.text) ?? 0;
+      // --- 6. إضافة قراءة الحقلين الجديدين ---
       final foundationFrames = int.tryParse(_foundationFramesController.text) ?? 0;
       final drawnFrames = int.tryParse(_drawnFramesController.text) ?? 0;
 
@@ -462,6 +467,9 @@ class _AddInspectionScreenState extends State<AddInspectionScreen> {
         honeyFrames: honeyFrames,
         pollenFrames: pollenFrames,
         emptyFrames: emptyFrames,
+        // --- 7. إضافة الحقلين الجديدين إلى النموذج ---
+        foundationFrames: foundationFrames,
+        drawnFrames: drawnFrames,
         issues: _selectedIssues,
         notes: _notesController.text.trim(),
         temperature: _temperature,
@@ -472,6 +480,7 @@ class _AddInspectionScreenState extends State<AddInspectionScreen> {
       final inspectionProvider = Provider.of<InspectionProvider>(context, listen: false);
       await inspectionProvider.addInspection(newInspection);
 
+      // --- 8. تعديل دالة تحديث الخلية لاستخدام القيم الجديدة ---
       await _updateHiveDataAfterInspection(newInspection, foundationFrames, drawnFrames);
 
       if (mounted) {
@@ -489,6 +498,7 @@ class _AddInspectionScreenState extends State<AddInspectionScreen> {
     }
   }
 
+  // --- 9. تعديل دالة التحديث لتشمل الحقلين الجديدين ---
   Future<void> _updateHiveDataAfterInspection(InspectionModel inspection, int foundation, int drawn) async {
     final hiveProvider = Provider.of<HiveProvider>(context, listen: false);
     final hiveToUpdate = hiveProvider.getHiveById(inspection.hiveId);

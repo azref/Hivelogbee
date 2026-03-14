@@ -25,6 +25,9 @@ class InspectionModel {
   final int honeyFrames;
   final int pollenFrames;
   final int emptyFrames;
+  // --- 1. إضافة الحقلين الجديدين ---
+  final int foundationFrames;  // إطارات شمع أساس
+  final int drawnFrames;       // إطارات شمع ممطوط
   final List<InspectionIssue> issues;
   final String? notes;
   final double? temperature;
@@ -48,6 +51,9 @@ class InspectionModel {
     required this.honeyFrames,
     required this.pollenFrames,
     required this.emptyFrames,
+    // --- 2. إضافة الحقلين في الـ constructor مع قيم افتراضية 0 ---
+    this.foundationFrames = 0,
+    this.drawnFrames = 0,
     this.issues = const [],
     this.notes,
     this.temperature,
@@ -56,7 +62,6 @@ class InspectionModel {
     this.actions = const [],
   });
 
-  // --- *** هذا هو الجزء الذي تم تعديله *** ---
   Map<String, dynamic> toMap() {
     // إنشاء الخريطة الأساسية
     final map = <String, dynamic>{
@@ -74,6 +79,9 @@ class InspectionModel {
       'honey_frames': honeyFrames,
       'pollen_frames': pollenFrames,
       'empty_frames': emptyFrames,
+      // --- 3. إضافة الحقلين إلى الخريطة ---
+      'foundation_frames': foundationFrames,
+      'drawn_frames': drawnFrames,
       'issues': issues.map((e) => e.name).toList(),
       'notes': notes,
       'temperature': temperature,
@@ -89,7 +97,6 @@ class InspectionModel {
 
     return map;
   }
-  // --- *** نهاية الجزء المعدل *** ---
 
   factory InspectionModel.fromMap(Map<String, dynamic> map) {
     return InspectionModel(
@@ -108,6 +115,9 @@ class InspectionModel {
       honeyFrames: map['honey_frames'] ?? 0,
       pollenFrames: map['pollen_frames'] ?? 0,
       emptyFrames: map['empty_frames'] ?? 0,
+      // --- 4. إضافة الحقلين في fromMap ---
+      foundationFrames: map['foundation_frames'] ?? 0,
+      drawnFrames: map['drawn_frames'] ?? 0,
       issues: (map['issues'] as List<dynamic>? ?? []).map((issue) => InspectionIssue.values.firstWhere((e) => e.name == issue, orElse: () => InspectionIssue.other)).toList(),
       notes: map['notes'],
       temperature: map['temperature']?.toDouble(),
@@ -137,6 +147,9 @@ class InspectionModel {
     int? honeyFrames,
     int? pollenFrames,
     int? emptyFrames,
+    // --- 5. إضافة الحقلين في copyWith ---
+    int? foundationFrames,
+    int? drawnFrames,
     List<InspectionIssue>? issues,
     String? notes,
     double? temperature,
@@ -160,6 +173,9 @@ class InspectionModel {
       honeyFrames: honeyFrames ?? this.honeyFrames,
       pollenFrames: pollenFrames ?? this.pollenFrames,
       emptyFrames: emptyFrames ?? this.emptyFrames,
+      // --- 6. إضافة الحقلين في copyWith ---
+      foundationFrames: foundationFrames ?? this.foundationFrames,
+      drawnFrames: drawnFrames ?? this.drawnFrames,
       issues: issues ?? this.issues,
       notes: notes ?? this.notes,
       temperature: temperature ?? this.temperature,

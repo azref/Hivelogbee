@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/hive_model.dart';
+import '../models/inspection_model.dart';
 import '../providers/hive_provider.dart';
+import '../providers/inspection_provider.dart';
 import '../utils/app_theme.dart';
 import '../l10n/app_localizations.dart';
 
@@ -39,9 +41,10 @@ class _HiveListScreenState extends State<HiveListScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    return Consumer<HiveProvider>(
-      builder: (context, provider, child) {
-        final hives = provider.getFilteredHives(widget.filter);
+    // --- 1. الاستماع لكل من HiveProvider و InspectionProvider ---
+    return Consumer2<HiveProvider, InspectionProvider>(
+      builder: (context, hiveProvider, inspectionProvider, child) {
+        final hives = hiveProvider.getFilteredHives(widget.filter);
         return Container(
           decoration: const BoxDecoration(
             image: DecorationImage(
@@ -51,9 +54,9 @@ class _HiveListScreenState extends State<HiveListScreen> {
           ),
           child: Column(
             children: [
-              _buildSearchField(l10n, provider),
+              _buildSearchField(l10n, hiveProvider),
               Expanded(
-                child: _buildHivesList(context, l10n, provider, hives),
+                child: _buildHivesList(context, l10n, hiveProvider, inspectionProvider, hives),
               ),
             ],
           ),
@@ -91,29 +94,51 @@ class _HiveListScreenState extends State<HiveListScreen> {
     );
   }
 
-  Widget _buildHivesList(BuildContext context, AppLocalizations l10n, HiveProvider provider, List<HiveModel> hives) {
-    if (provider.isLoading && hives.isEmpty) {
+  Widget _buildHivesList(BuildContext context, AppLocalizations l10n, HiveProvider hiveProvider, InspectionProvider inspectionProvider, List<HiveModel> hives) {
+    if (hiveProvider.isLoading && hives.isEmpty) {
       return const Center(child: CircularProgressIndicator(color: AppTheme.primaryYellow));
     }
     if (hives.isEmpty) {
       return _buildEmptyState(context, l10n);
     }
     return RefreshIndicator(
-      onRefresh: () => provider.fetchHives(),
+      onRefresh: () => hiveProvider.fetchHives(),
       color: AppTheme.primaryYellow,
       child: ListView.builder(
         padding: const EdgeInsets.all(16),
         itemCount: hives.length,
         itemBuilder: (context, index) {
           final hive = hives[index];
-          return _buildHiveCard(context, hive, l10n);
+          // --- 2. جلب آخر فحص للخلية ---
+          final hiveInspections = inspectionProvider.getInspectionsByHive(hive.id);
+          final InspectionModel? latestInspection = hiveInspections.isNotEmpty ? hiveInspections.first : null;
+
+          return _buildHiveCard(context, hive, latestInspection, l10n);
         },
       ),
     );
   }
 
-  Widget _buildHiveCard(BuildContext context, HiveModel hive, AppLocalizations l10n) {
+  // --- 3. تعديل دالة بناء البطاقة لاستقبال آخر فحص ---
+  Widget _buildHiveCard(BuildContext context, HiveModel hive, InspectionModel? latestInspection, AppLocalizations l10n) {
     final statusColor = _getStatusColor(hive.status);
+
+    // --- 4. استخدام بيانات آخر فحص إذا كان متاحاً ---
+    final frameCount = latestInspection != null
+        ? latestInspection.broodFrames +
+        latestInspection.honeyFrames +
+        latestInspection.pollenFrames +
+        latestInspection.emptyFrames +
+        latestInspection.foundationFrames +
+        latestInspection.drawnFrames
+        : hive.frameCount;
+
+    final queenStatusText = latestInspection != null
+        ? _getTranslatedQueenPresence(latestInspection.queenPresence, l10n)
+        : hive.queenStatusDisplayName;
+
+    final lastActivityDate = latestInspection?.date ?? hive.createdDate;
+
     return Card(
       elevation: 8,
       shadowColor: Colors.black.withAlpha(128),
@@ -179,21 +204,20 @@ class _HiveListScreenState extends State<HiveListScreen> {
                         ],
                       ),
                       const Divider(height: 24),
-                      // تم استخدام Expanded و flex لضمان توزيع المساحة وعدم حدوث Overflow
                       Row(
                         children: [
                           Expanded(
                             flex: 3,
                             child: _buildInfoChip(
                               icon: Icons.layers,
-                              text: '${hive.frameCount} إطارات',
+                              text: '$frameCount إطارات',
                             ),
                           ),
                           Expanded(
                             flex: 4,
                             child: _buildInfoChip(
                               icon: Icons.female,
-                              text: hive.queenStatusDisplayName,
+                              text: queenStatusText,
                             ),
                           ),
                           Expanded(
@@ -202,7 +226,7 @@ class _HiveListScreenState extends State<HiveListScreen> {
                               alignment: Alignment.centerLeft,
                               child: _buildInfoChip(
                                 icon: Icons.calendar_today_outlined,
-                                text: '${hive.createdDate.day}/${hive.createdDate.month}',
+                                text: '${lastActivityDate.day}/${lastActivityDate.month}',
                               ),
                             ),
                           ),
@@ -225,7 +249,7 @@ class _HiveListScreenState extends State<HiveListScreen> {
       children: [
         Icon(icon, size: 14, color: Colors.grey.shade700),
         const SizedBox(width: 4),
-        Expanded( // لضمان بقاء النص داخل حدود الـ Expanded الرئيسي
+        Expanded(
           child: Text(
             text,
             style: TextStyle(
@@ -279,6 +303,16 @@ class _HiveListScreenState extends State<HiveListScreen> {
       case HiveStatus.queenless: return AppTheme.errorColor;
       case HiveStatus.dead: return Colors.black54;
       default: return Colors.grey;
+    }
+  }
+
+  // --- 5. دالة مساعدة لترجمة حالة الملكة ---
+  String _getTranslatedQueenPresence(QueenPresence status, AppLocalizations l10n) {
+    switch (status) {
+      case QueenPresence.present: return "موجودة";
+      case QueenPresence.absent: return "غائبة";
+      case QueenPresence.newQueen: return "جديدة";
+      case QueenPresence.unseen: return "لم تَرَ";
     }
   }
 }

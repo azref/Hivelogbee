@@ -36,6 +36,12 @@ class HiveOverviewTab extends StatelessWidget {
           const SizedBox(height: 24),
           _buildNotesSection(hive, latestInspection),
           const SizedBox(height: 24),
+          if (latestInspection != null &&
+              (latestInspection!.temperature != null || latestInspection!.humidity != null))
+            _buildEnvironmentalSection(context, latestInspection!),
+          if (latestInspection != null &&
+              (latestInspection!.temperature != null || latestInspection!.humidity != null))
+            const SizedBox(height: 24),
           _buildActionsSection(context, latestInspection),
           const SizedBox(height: 24),
           _buildIssuesSection(context, latestInspection),
@@ -62,7 +68,6 @@ class HiveOverviewTab extends StatelessWidget {
       ),
     );
   }
-
   Widget _buildNotesSection(HiveModel hive, InspectionModel? inspection) {
     final notes = inspection?.notes != null && inspection!.notes!.isNotEmpty
         ? inspection.notes
@@ -74,7 +79,6 @@ class HiveOverviewTab extends StatelessWidget {
       child: Text(notes, style: const TextStyle(fontSize: 16, color: AppTheme.darkBrown, height: 1.5)),
     );
   }
-
   Widget _buildQueenSection(BuildContext context, HiveModel hive, InspectionModel? inspection) {
     final l10n = AppLocalizations.of(context)!;
     final queenPresence = inspection?.queenPresence;
@@ -100,11 +104,12 @@ class HiveOverviewTab extends StatelessWidget {
     final pollenFrames = inspection?.pollenFrames ?? hive.pollenFrames;
     final emptyFrames = inspection?.emptyFrames ?? hive.emptyFrames;
 
-    // حساب الشمع الجديد من الإجراءات إذا وجد في آخر فحص
-    int foundationFrames = 0;
-    int drawnFrames = 0;
+    // قراءة الحقلين مباشرة من inspection
+    int foundationFrames = inspection?.foundationFrames ?? 0;
+    int drawnFrames = inspection?.drawnFrames ?? 0;
 
-    if (inspection != null && inspection.actions.isNotEmpty) {
+    // إذا لم تكن القيم موجودة في النموذج، نبحث في الإجراءات (للتوافق مع البيانات القديمة)
+    if (inspection != null && inspection.actions.isNotEmpty && foundationFrames == 0 && drawnFrames == 0) {
       for (var action in inspection.actions) {
         if (action['action'] == 'add_frames') {
           if (action['type'] == 'foundation') {
@@ -130,14 +135,13 @@ class HiveOverviewTab extends StatelessWidget {
           _buildFrameBar(label: 'حبوب لقاح', count: pollenFrames, total: totalFrames, color: Colors.green),
           const SizedBox(height: 12),
           _buildFrameBar(label: 'فارغة', count: emptyFrames, total: totalFrames, color: Colors.grey.shade400),
-          if (foundationFrames > 0 || drawnFrames > 0) ...[
-            const Divider(height: 24),
-            if (foundationFrames > 0)
-              _buildFrameBar(label: 'شمع أساس (جديد)', count: foundationFrames, total: totalFrames, color: Colors.blueGrey),
-            if (drawnFrames > 0)
-              const SizedBox(height: 12),
-            if (drawnFrames > 0)
-              _buildFrameBar(label: 'شمع ممطوط (جديد)', count: drawnFrames, total: totalFrames, color: Colors.brown.shade300),
+          if (foundationFrames > 0) ...[
+            const SizedBox(height: 12),
+            _buildFrameBar(label: 'شمع أساس', count: foundationFrames, total: totalFrames, color: Colors.blueGrey),
+          ],
+          if (drawnFrames > 0) ...[
+            const SizedBox(height: 12),
+            _buildFrameBar(label: 'شمع ممطوط', count: drawnFrames, total: totalFrames, color: Colors.brown.shade300),
           ],
           const Divider(height: 24),
           Row(
@@ -147,6 +151,43 @@ class HiveOverviewTab extends StatelessWidget {
               Text('$totalFrames', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppTheme.darkBrown)),
             ],
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEnvironmentalSection(BuildContext context, InspectionModel inspection) {
+    return _buildCard(
+      title: 'البيانات البيئية',
+      icon: Icons.thermostat,
+      child: Row(
+        children: [
+          if (inspection.temperature != null)
+            Expanded(
+              child: Column(
+                children: [
+                  Icon(Icons.thermostat, color: Colors.orange.shade700, size: 28),
+                  const SizedBox(height: 8),
+                  Text('${inspection.temperature!.round()}°C',
+                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  const Text('درجة الحرارة', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                ],
+              ),
+            ),
+          if (inspection.temperature != null && inspection.humidity != null)
+            const SizedBox(width: 16),
+          if (inspection.humidity != null)
+            Expanded(
+              child: Column(
+                children: [
+                  Icon(Icons.water_drop, color: Colors.blue.shade700, size: 28),
+                  const SizedBox(height: 8),
+                  Text('${inspection.humidity!.round()}%',
+                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  const Text('الرطوبة', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                ],
+              ),
+            ),
         ],
       ),
     );
@@ -446,10 +487,17 @@ class _HiveDetailsScreenState extends State<HiveDetailsScreen> {
     int foundation = 0;
     int drawn = 0;
     if (inspection != null) {
-      for (var a in inspection.actions) {
-        if (a['action'] == 'add_frames') {
-          if (a['type'] == 'foundation') foundation += (a['count'] as num).toInt();
-          else if (a['type'] == 'drawn') drawn += (a['count'] as num).toInt();
+      // قراءة القيم مباشرة من inspection أولاً
+      foundation = inspection.foundationFrames;
+      drawn = inspection.drawnFrames;
+
+      // إذا كانت القيم صفراً، نبحث في الإجراءات (للتوافق)
+      if (foundation == 0 && drawn == 0) {
+        for (var a in inspection.actions) {
+          if (a['action'] == 'add_frames') {
+            if (a['type'] == 'foundation') foundation += (a['count'] as num).toInt();
+            else if (a['type'] == 'drawn') drawn += (a['count'] as num).toInt();
+          }
         }
       }
     }
