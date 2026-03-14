@@ -63,7 +63,6 @@ class HiveOverviewTab extends StatelessWidget {
     );
   }
 
-  // --- تعديل: التأكد من أن منطق الملاحظات يعطي الأولوية للفحص ---
   Widget _buildNotesSection(HiveModel hive, InspectionModel? inspection) {
     final notes = inspection?.notes != null && inspection!.notes!.isNotEmpty
         ? inspection.notes
@@ -100,7 +99,24 @@ class HiveOverviewTab extends StatelessWidget {
     final honeyFrames = inspection?.honeyFrames ?? hive.honeyFrames;
     final pollenFrames = inspection?.pollenFrames ?? hive.pollenFrames;
     final emptyFrames = inspection?.emptyFrames ?? hive.emptyFrames;
-    final totalFrames = broodFrames + honeyFrames + pollenFrames + emptyFrames;
+
+    // حساب الشمع الجديد من الإجراءات إذا وجد في آخر فحص
+    int foundationFrames = 0;
+    int drawnFrames = 0;
+
+    if (inspection != null && inspection.actions.isNotEmpty) {
+      for (var action in inspection.actions) {
+        if (action['action'] == 'add_frames') {
+          if (action['type'] == 'foundation') {
+            foundationFrames += (action['count'] as num).toInt();
+          } else if (action['type'] == 'drawn') {
+            drawnFrames += (action['count'] as num).toInt();
+          }
+        }
+      }
+    }
+
+    final totalFrames = broodFrames + honeyFrames + pollenFrames + emptyFrames + foundationFrames + drawnFrames;
 
     return _buildCard(
       title: 'توزيع الإطارات',
@@ -108,12 +124,21 @@ class HiveOverviewTab extends StatelessWidget {
       child: Column(
         children: [
           _buildFrameBar(label: 'حضنة', count: broodFrames, total: totalFrames, color: AppTheme.primaryYellow),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
           _buildFrameBar(label: 'عسل', count: honeyFrames, total: totalFrames, color: AppTheme.honeyOrange),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
           _buildFrameBar(label: 'حبوب لقاح', count: pollenFrames, total: totalFrames, color: Colors.green),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
           _buildFrameBar(label: 'فارغة', count: emptyFrames, total: totalFrames, color: Colors.grey.shade400),
+          if (foundationFrames > 0 || drawnFrames > 0) ...[
+            const Divider(height: 24),
+            if (foundationFrames > 0)
+              _buildFrameBar(label: 'شمع أساس (جديد)', count: foundationFrames, total: totalFrames, color: Colors.blueGrey),
+            if (drawnFrames > 0)
+              const SizedBox(height: 12),
+            if (drawnFrames > 0)
+              _buildFrameBar(label: 'شمع ممطوط (جديد)', count: drawnFrames, total: totalFrames, color: Colors.brown.shade300),
+          ],
           const Divider(height: 24),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -127,13 +152,12 @@ class HiveOverviewTab extends StatelessWidget {
     );
   }
 
-  // --- تعديل: تحسينات جمالية للعنوان وحجم الخط ---
   Widget _buildActionsSection(BuildContext context, InspectionModel? inspection) {
     if (inspection == null || inspection.actions.isEmpty) {
       return const SizedBox.shrink();
     }
     return _buildCard(
-      title: 'الإجراءات المتخذة', // إزالة (آخر فحص)
+      title: 'الإجراءات المتخذة',
       icon: Icons.build,
       child: Wrap(
         spacing: 8.0,
@@ -141,8 +165,9 @@ class HiveOverviewTab extends StatelessWidget {
         children: inspection.actions.map((action) => Chip(
           label: Text(
             _getActionText(action),
-            style: const TextStyle(fontSize: 12), // تصغير حجم الخط
+            style: const TextStyle(fontSize: 12, fontFamily: 'Cairo'),
           ),
+          backgroundColor: AppTheme.primaryYellow.withAlpha(30),
         )).toList(),
       ),
     );
@@ -172,14 +197,14 @@ class HiveOverviewTab extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(label, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: AppTheme.darkBrown)),
-            Text('$count', style: TextStyle(fontSize: 16, color: AppTheme.darkBrown.withAlpha(178))),
+            Text(label, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: AppTheme.darkBrown)),
+            Text('$count', style: TextStyle(fontSize: 15, color: AppTheme.darkBrown.withAlpha(178))),
           ],
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 6),
         ClipRRect(
           borderRadius: BorderRadius.circular(10),
-          child: LinearProgressIndicator(value: percentage, minHeight: 12, backgroundColor: Colors.grey.shade300, color: color),
+          child: LinearProgressIndicator(value: percentage, minHeight: 10, backgroundColor: Colors.grey.shade300, color: color),
         ),
       ],
     );
@@ -275,13 +300,16 @@ class HiveOverviewTab extends StatelessWidget {
 
   String _getActionText(Map<String, dynamic> action) {
     switch (action['action']) {
-      case 'add_frames': return 'أضاف ${action['count']} إطارات';
-      case 'add_feeding': return 'أضاف تغذية';
+      case 'add_frames':
+        String type = action['type'] == 'foundation' ? 'أساس' : 'ممطوط';
+        return 'أضاف ${action['count']} إطارات ($type)';
+      case 'add_feeding': return 'أضاف تغذية ${action['type'] == 'sugar' ? 'سكري' : 'بروتين'}';
       case 'add_super': return 'أضاف عاسلة';
       case 'remove_super': return 'أزال عاسلة';
       case 'add_queen_excluder': return 'أضاف حاجز ملكي';
       case 'remove_queen_excluder': return 'أزال حاجز ملكي';
       case 'replace_queen': return 'استبدل الملكة';
+      case 'set_entrance': return 'ضبط المدخل';
       default: return action['action'].toString();
     }
   }
@@ -300,6 +328,7 @@ class HiveOverviewTab extends StatelessWidget {
     }
   }
 }
+
 // --- HiveTreatmentsTab & HiveProductionTab ---
 class HiveTreatmentsTab extends StatelessWidget {
   final HiveModel hive;
@@ -387,7 +416,6 @@ class _HiveDetailsScreenState extends State<HiveDetailsScreen> {
                         value: 'inspect',
                         child: Row(children: [const Icon(Icons.search, size: 20), const SizedBox(width: 8), Text(AppLocalizations.of(context)!.add_inspection)]),
                       ),
-                      // يمكنك إضافة المزيد من العناصر هنا
                     ],
                   ),
                 ),
@@ -413,10 +441,24 @@ class _HiveDetailsScreenState extends State<HiveDetailsScreen> {
     final l10n = AppLocalizations.of(context)!;
     final statusText = inspection != null ? _getTranslatedHiveHealth(inspection.hiveHealth, l10n) : hive.statusDisplayName;
     final statusColor = _getStatusColor(inspection?.hiveHealth, hive.status);
+
+    // حساب الإجمالي في الهيدر ليشمل الحقول الجديدة أيضاً
+    int foundation = 0;
+    int drawn = 0;
+    if (inspection != null) {
+      for (var a in inspection.actions) {
+        if (a['action'] == 'add_frames') {
+          if (a['type'] == 'foundation') foundation += (a['count'] as num).toInt();
+          else if (a['type'] == 'drawn') drawn += (a['count'] as num).toInt();
+        }
+      }
+    }
+
     final totalFrames = (inspection?.broodFrames ?? hive.broodFrames) +
         (inspection?.honeyFrames ?? hive.honeyFrames) +
         (inspection?.pollenFrames ?? hive.pollenFrames) +
-        (inspection?.emptyFrames ?? hive.emptyFrames);
+        (inspection?.emptyFrames ?? hive.emptyFrames) + foundation + drawn;
+
     final queenStatusText = inspection != null ? _getTranslatedQueenPresence(inspection.queenPresence, l10n) : hive.queenStatusDisplayName;
 
     return Container(
