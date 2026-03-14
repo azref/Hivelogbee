@@ -5,7 +5,7 @@ import '../providers/auth_provider.dart';
 import '../providers/hive_provider.dart';
 // --- 1. استيراد الـ Provider المفقود ---
 import '../providers/inspection_provider.dart';
-import '../providers/treatment_provider.dart';
+
 import '../widgets/custom_app_bar.dart';
 import '../widgets/custom_bottom_nav_bar.dart';
 import '../utils/app_theme.dart';

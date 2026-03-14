@@ -140,4 +140,12 @@ class InspectionProvider extends ChangeNotifier {
     _inspectionsSubscription?.cancel();
     super.dispose();
   }
+  // داخل كلاس InspectionProvider
+
+  /// دالة مساعدة لفلترة الفحوصات الخاصة بخلية معينة من القائمة الكاملة.
+  List<InspectionModel> getInspectionsByHive(String hiveId) {
+    // استخدام where لفلترة القائمة الرئيسية _inspections
+    return _inspections.where((inspection) => inspection.hiveId == hiveId).toList();
+  }
+
 }
