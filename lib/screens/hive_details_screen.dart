@@ -30,6 +30,15 @@ class HiveOverviewTab extends StatelessWidget {
         children: [
           _buildInfoSection(context, hive, latestInspection, inspections),
           const SizedBox(height: 24),
+          // =======================================================================
+          // الإصلاح: استدعاء القسمين المنفصلين
+          // =======================================================================
+          _buildCoreStatusSection(context, hive), // القسم الأول: الحالة الأساسية
+          if (latestInspection != null) ...[
+            const SizedBox(height: 24),
+            _buildInspectionHealthSection(context, latestInspection!), // القسم الثاني: قوة الفحص
+          ],
+          const SizedBox(height: 24),
           _buildQueenSection(context, hive, latestInspection),
           const SizedBox(height: 24),
           _buildFramesSection(hive, latestInspection),
@@ -53,6 +62,39 @@ class HiveOverviewTab extends StatelessWidget {
     );
   }
 
+  // =======================================================================
+  // الإصلاح: تعريف القسمين بشكل منفصل وواضح
+  // =======================================================================
+
+  /// القسم 1: يعرض الحالة الأساسية للخلية أو الطرد (نشطة، ضعيفة، قيد التلقيح، إلخ)
+  Widget _buildCoreStatusSection(BuildContext context, HiveModel hive) {
+    final isNucleus = hive.type == HiveType.nucleus;
+    return _buildCard(
+      title: isNucleus ? 'حالة الطرد' : 'حالة الخلية',
+      icon: Icons.shield_outlined,
+      child: Column(
+        children: [
+          _buildInfoRow('الحالة الحالية', hive.statusDisplayName),
+          if (isNucleus && hive.nucleusStatus != null)
+            _buildInfoRow('حالة التلقيح', hive.nucleusStatusDisplayName),
+        ],
+      ),
+    );
+  }
+
+  /// القسم 2: يعرض قوة الخلية كما سُجلت في آخر فحص (قوي، متوسط، ضعيف)
+  Widget _buildInspectionHealthSection(BuildContext context, InspectionModel inspection) {
+    final l10n = AppLocalizations.of(context)!;
+    return _buildCard(
+      title: 'الحالة العامة ',
+      icon: Icons.leaderboard_outlined,
+      child: _buildInfoRow(
+        'التقييم',
+        _getTranslatedHiveHealth(inspection.hiveHealth, l10n),
+      ),
+    );
+  }
+
   Widget _buildInfoSection(BuildContext context, HiveModel hive, InspectionModel? latestInspection, List<InspectionModel> inspections) {
     final l10n = AppLocalizations.of(context)!;
     return _buildCard(
@@ -60,14 +102,15 @@ class HiveOverviewTab extends StatelessWidget {
       icon: Icons.info_outline,
       child: Column(
         children: [
+          _buildInfoRow('النوع', hive.typeDisplayName),
           _buildInfoRow(l10n.installation_date, _formatDate(hive.createdDate)),
           _buildInfoRow('آخر فحص', latestInspection != null ? _formatDate(latestInspection.date) : 'لا يوجد'),
           _buildInfoRow('عدد الفحوصات', inspections.length.toString()),
-          _buildInfoRow('العلاجات النشطة', 'N/A'),
         ],
       ),
     );
   }
+
   Widget _buildNotesSection(HiveModel hive, InspectionModel? inspection) {
     final notes = inspection?.notes != null && inspection!.notes!.isNotEmpty
         ? inspection.notes
@@ -79,6 +122,7 @@ class HiveOverviewTab extends StatelessWidget {
       child: Text(notes, style: const TextStyle(fontSize: 16, color: AppTheme.darkBrown, height: 1.5)),
     );
   }
+
   Widget _buildQueenSection(BuildContext context, HiveModel hive, InspectionModel? inspection) {
     final l10n = AppLocalizations.of(context)!;
     final queenPresence = inspection?.queenPresence;
@@ -103,12 +147,9 @@ class HiveOverviewTab extends StatelessWidget {
     final honeyFrames = inspection?.honeyFrames ?? hive.honeyFrames;
     final pollenFrames = inspection?.pollenFrames ?? hive.pollenFrames;
     final emptyFrames = inspection?.emptyFrames ?? hive.emptyFrames;
-
-    // قراءة الحقلين مباشرة من inspection
     int foundationFrames = inspection?.foundationFrames ?? 0;
     int drawnFrames = inspection?.drawnFrames ?? 0;
 
-    // إذا لم تكن القيم موجودة في النموذج، نبحث في الإجراءات (للتوافق مع البيانات القديمة)
     if (inspection != null && inspection.actions.isNotEmpty && foundationFrames == 0 && drawnFrames == 0) {
       for (var action in inspection.actions) {
         if (action['action'] == 'add_frames') {
@@ -368,6 +409,14 @@ class HiveOverviewTab extends StatelessWidget {
       default: return issue.name;
     }
   }
+
+  String _getTranslatedHiveHealth(HiveHealth health, AppLocalizations l10n) {
+    switch (health) {
+      case HiveHealth.strong: return "قوي";
+      case HiveHealth.average: return "متوسط";
+      case HiveHealth.weak: return "ضعيف";
+    }
+  }
 }
 
 // --- HiveTreatmentsTab & HiveProductionTab ---
@@ -480,18 +529,15 @@ class _HiveDetailsScreenState extends State<HiveDetailsScreen> {
 
   Widget _buildHiveHeader(HiveModel hive, InspectionModel? inspection) {
     final l10n = AppLocalizations.of(context)!;
+    // النص العلوي يعتمد على قوة الفحص إن وجد، وإلا يعتمد على حالة الخلية
     final statusText = inspection != null ? _getTranslatedHiveHealth(inspection.hiveHealth, l10n) : hive.statusDisplayName;
-    final statusColor = _getStatusColor(inspection?.hiveHealth, hive.status);
+    final statusColor = _getStatusColor(inspection?.hiveHealth, hive.status, hive.nucleusStatus);
 
-    // حساب الإجمالي في الهيدر ليشمل الحقول الجديدة أيضاً
     int foundation = 0;
     int drawn = 0;
     if (inspection != null) {
-      // قراءة القيم مباشرة من inspection أولاً
       foundation = inspection.foundationFrames;
       drawn = inspection.drawnFrames;
-
-      // إذا كانت القيم صفراً، نبحث في الإجراءات (للتوافق)
       if (foundation == 0 && drawn == 0) {
         for (var a in inspection.actions) {
           if (a['action'] == 'add_frames') {
@@ -524,14 +570,14 @@ class _HiveDetailsScreenState extends State<HiveDetailsScreen> {
               Container(
                 width: 60, height: 60,
                 decoration: BoxDecoration(color: Colors.white.withAlpha(51), borderRadius: BorderRadius.circular(15)),
-                child: Icon(_getHiveIcon(hive.isNucleus), size: 35, color: Colors.white),
+                child: Icon(_getHiveIcon(hive.type), size: 35, color: Colors.white),
               ),
               const SizedBox(width: 16),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('${hive.isNucleus ? 'طرد' : 'خلية'} رقم ${hive.hiveNumber}', style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white)),
+                    Text('${hive.typeDisplayName} رقم ${hive.hiveNumber}', style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white)),
                     const SizedBox(height: 4),
                     Text(statusText, style: TextStyle(fontSize: 16, color: Colors.white.withAlpha(230))),
                   ],
@@ -569,7 +615,7 @@ class _HiveDetailsScreenState extends State<HiveDetailsScreen> {
     );
   }
 
-  Color _getStatusColor(HiveHealth? inspectionHealth, HiveStatus hiveStatus) {
+  Color _getStatusColor(HiveHealth? inspectionHealth, HiveStatus hiveStatus, NucleusStatus? nucleusStatus) {
     if (inspectionHealth != null) {
       switch (inspectionHealth) {
         case HiveHealth.strong: return AppTheme.successColor;
@@ -577,16 +623,30 @@ class _HiveDetailsScreenState extends State<HiveDetailsScreen> {
         case HiveHealth.weak: return AppTheme.errorColor;
       }
     }
+    if (nucleusStatus != null) {
+      switch (nucleusStatus) {
+        case NucleusStatus.mated:
+        case NucleusStatus.laying:
+          return AppTheme.successColor;
+        case NucleusStatus.mating:
+          return AppTheme.primaryYellow;
+        case NucleusStatus.failed:
+          return AppTheme.errorColor;
+      }
+    }
     switch (hiveStatus) {
       case HiveStatus.active: return AppTheme.successColor;
       case HiveStatus.weak: return Colors.orange;
-      case HiveStatus.sick: return AppTheme.errorColor;
+      case HiveStatus.sick:
+      case HiveStatus.queenless:
+        return AppTheme.errorColor;
+      case HiveStatus.dead: return Colors.black54;
       default: return Colors.grey;
     }
   }
 
-  IconData _getHiveIcon(bool isNucleus) {
-    return isNucleus ? Icons.egg : Icons.hive;
+  IconData _getHiveIcon(HiveType type) {
+    return type == HiveType.nucleus ? Icons.egg_outlined : Icons.hive_outlined;
   }
 
   String _getTranslatedQueenPresence(QueenPresence status, AppLocalizations l10n) {

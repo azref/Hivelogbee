@@ -10,6 +10,7 @@ import '../widgets/custom_app_bar.dart';
 import '../services/ad_service.dart';
 import '../l10n/app_localizations.dart';
 import '../widgets/add_inspection_widgets.dart';
+import '../widgets/hive_status_selector.dart';
 
 class AddInspectionScreen extends StatefulWidget {
   final String? hiveId;
@@ -26,9 +27,12 @@ class _AddInspectionScreenState extends State<AddInspectionScreen> {
   final _honeyFramesController = TextEditingController(text: '0');
   final _pollenFramesController = TextEditingController(text: '0');
   final _emptyFramesController = TextEditingController(text: '0');
-  // --- 1. إضافة المتحكمين الجديدين ---
   final _foundationFramesController = TextEditingController(text: '0');
   final _drawnFramesController = TextEditingController(text: '0');
+
+  HiveModel? _selectedHive;
+  HiveStatus? _selectedHiveStatus;
+  NucleusStatus? _selectedNucleusStatus;
 
   String? _selectedHiveNumber;
   String? _selectedHiveId;
@@ -40,8 +44,8 @@ class _AddInspectionScreenState extends State<AddInspectionScreen> {
   double _temperature = 25.0;
   double _humidity = 60.0;
   final List<InspectionIssue> _selectedIssues = [];
-  bool _eggsSeen = false;
-  bool _queenCellsSeen = false;
+  final bool _eggsSeen = false;
+  final bool _queenCellsSeen = false;
   bool _isLoading = false;
   final List<Map<String, dynamic>> _takenActions = [];
 
@@ -67,15 +71,17 @@ class _AddInspectionScreenState extends State<AddInspectionScreen> {
     InspectionModel? lastInspection = lastInspections.isNotEmpty ? lastInspections.first : null;
 
     setState(() {
+      _selectedHive = hive;
       _selectedHiveId = hive.id;
       _selectedHiveNumber = hive.hiveNumber;
+      _selectedHiveStatus = hive.status;
+      _selectedNucleusStatus = hive.nucleusStatus;
 
       if (lastInspection != null) {
         _broodFramesController.text = lastInspection.broodFrames.toString();
         _honeyFramesController.text = lastInspection.honeyFrames.toString();
         _pollenFramesController.text = lastInspection.pollenFrames.toString();
         _emptyFramesController.text = lastInspection.emptyFrames.toString();
-        // --- 2. إضافة تحميل القيم من آخر فحص ---
         _foundationFramesController.text = lastInspection.foundationFrames.toString();
         _drawnFramesController.text = lastInspection.drawnFrames.toString();
         _queenStatus = lastInspection.queenPresence;
@@ -88,8 +94,6 @@ class _AddInspectionScreenState extends State<AddInspectionScreen> {
         _honeyFramesController.text = hive.honeyFrames.toString();
         _pollenFramesController.text = hive.pollenFrames.toString();
         _emptyFramesController.text = hive.emptyFrames.toString();
-        // --- 3. إضافة القيم الافتراضية من الخلية (إذا كانت موجودة) ---
-        // حالياً الـ HiveModel لا يحتوي على هذين الحقلين، لذا نضع 0
         _foundationFramesController.text = '0';
         _drawnFramesController.text = '0';
         _notesController.text = hive.notes ?? '';
@@ -108,7 +112,6 @@ class _AddInspectionScreenState extends State<AddInspectionScreen> {
     _honeyFramesController.dispose();
     _pollenFramesController.dispose();
     _emptyFramesController.dispose();
-    // --- 4. إضافة التخلص من المتحكمين الجديدين ---
     _foundationFramesController.dispose();
     _drawnFramesController.dispose();
     super.dispose();
@@ -122,7 +125,18 @@ class _AddInspectionScreenState extends State<AddInspectionScreen> {
       case QueenPresence.unseen: return "لم يتم رؤيتها";
     }
   }
-
+  String _getTranslatedHiveStatus(HiveStatus status, AppLocalizations l10n) {
+    switch (status) {
+      case HiveStatus.active: return 'نشطة';
+      case HiveStatus.weak: return 'ضعيفة';
+      case HiveStatus.queenless: return 'بدون ملكة';
+      case HiveStatus.sick: return 'مريضة';
+      case HiveStatus.split: return 'مقسمة';
+      case HiveStatus.merged: return 'مدمومة';
+    // تم حذف حالة 'ميتة' من العرض، ولكن نتركها هنا للسلامة
+      case HiveStatus.dead: return 'ميتة';
+    }
+  }
   String _getBroodPatternText(BroodPattern pattern, AppLocalizations l10n) {
     switch (pattern) {
       case BroodPattern.good: return "جيد";
@@ -212,6 +226,30 @@ class _AddInspectionScreenState extends State<AddInspectionScreen> {
                 ),
               ),
               const SizedBox(height: 24),
+
+              // =======================================================================
+              // القسم الأول: حالة الخلية/الطرد (نشطة، ضعيفة، قيد التلقيح، إلخ)
+              // =======================================================================
+              if (_selectedHive != null && _selectedHive!.status != HiveStatus.dead)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 24.0),
+                  child: HiveStatusSelector(
+                    selectedType: _selectedHive!.type,
+                    hiveStatus: _selectedHiveStatus!,
+                    nucleusStatus: _selectedNucleusStatus,
+                    onChanged: (newValue) {
+                      setState(() {
+                        if (newValue is HiveStatus) {
+                          _selectedHiveStatus = newValue;
+                        } else if (newValue is NucleusStatus) {
+                          _selectedNucleusStatus = newValue;
+                        }
+                      });
+                    },
+                  ),
+                ),
+
+
               buildTitledCard(
                 title: l10n.queen_status,
                 child: buildSelectionField(
@@ -239,7 +277,6 @@ class _AddInspectionScreenState extends State<AddInspectionScreen> {
                           Expanded(child: _buildFrameInputField(_emptyFramesController, 'فارغة', Icons.check_box_outline_blank)),
                         ],
                       ),
-                      // --- 5. إضافة الحقلين الجديدين ---
                       const SizedBox(height: 12),
                       const Divider(),
                       const SizedBox(height: 8),
@@ -262,6 +299,10 @@ class _AddInspectionScreenState extends State<AddInspectionScreen> {
                 ),
               ),
               const SizedBox(height: 24),
+
+              // =======================================================================
+              // القسم الثاني: الحالة العامة للفحص (قوي، متوسط، ضعيف)
+              // =======================================================================
               buildTitledCard(
                 title: l10n.overall_status,
                 child: buildSelectionField(
@@ -270,6 +311,7 @@ class _AddInspectionScreenState extends State<AddInspectionScreen> {
                 ),
               ),
               const SizedBox(height: 24),
+
               buildTitledCard(
                 title: l10n.detected_issues,
                 child: buildSelectionField(
@@ -448,7 +490,6 @@ class _AddInspectionScreenState extends State<AddInspectionScreen> {
       final honeyFrames = int.tryParse(_honeyFramesController.text) ?? 0;
       final pollenFrames = int.tryParse(_pollenFramesController.text) ?? 0;
       final emptyFrames = int.tryParse(_emptyFramesController.text) ?? 0;
-      // --- 6. إضافة قراءة الحقلين الجديدين ---
       final foundationFrames = int.tryParse(_foundationFramesController.text) ?? 0;
       final drawnFrames = int.tryParse(_drawnFramesController.text) ?? 0;
 
@@ -467,7 +508,6 @@ class _AddInspectionScreenState extends State<AddInspectionScreen> {
         honeyFrames: honeyFrames,
         pollenFrames: pollenFrames,
         emptyFrames: emptyFrames,
-        // --- 7. إضافة الحقلين الجديدين إلى النموذج ---
         foundationFrames: foundationFrames,
         drawnFrames: drawnFrames,
         issues: _selectedIssues,
@@ -480,7 +520,6 @@ class _AddInspectionScreenState extends State<AddInspectionScreen> {
       final inspectionProvider = Provider.of<InspectionProvider>(context, listen: false);
       await inspectionProvider.addInspection(newInspection);
 
-      // --- 8. تعديل دالة تحديث الخلية لاستخدام القيم الجديدة ---
       await _updateHiveDataAfterInspection(newInspection, foundationFrames, drawnFrames);
 
       if (mounted) {
@@ -498,26 +537,25 @@ class _AddInspectionScreenState extends State<AddInspectionScreen> {
     }
   }
 
-  // --- 9. تعديل دالة التحديث لتشمل الحقلين الجديدين ---
   Future<void> _updateHiveDataAfterInspection(InspectionModel inspection, int foundation, int drawn) async {
-    final hiveProvider = Provider.of<HiveProvider>(context, listen: false);
-    final hiveToUpdate = hiveProvider.getHiveById(inspection.hiveId);
+    final hiveToUpdate = _selectedHive;
 
     if (hiveToUpdate != null) {
-      // إجمالي الإطارات يشمل الإطارات الحالية + الشمع الجديد المضاف
       final totalFrames = inspection.broodFrames + inspection.honeyFrames + inspection.pollenFrames + inspection.emptyFrames + foundation + drawn;
-      bool isUpgraded = hiveToUpdate.isNucleus && totalFrames >= 6;
+      bool isUpgraded = hiveToUpdate.type == HiveType.nucleus && totalFrames >= 6;
 
       final updatedHive = hiveToUpdate.copyWith(
         broodFrames: inspection.broodFrames,
         honeyFrames: inspection.honeyFrames,
         pollenFrames: inspection.pollenFrames,
-        emptyFrames: inspection.emptyFrames + foundation + drawn, // نضيف الشمع الجديد للفارغ مبدئياً
+        emptyFrames: inspection.emptyFrames + foundation + drawn,
         frameCount: totalFrames,
-        isNucleus: isUpgraded ? false : hiveToUpdate.isNucleus,
+        type: isUpgraded ? HiveType.fullHive : hiveToUpdate.type,
         lastInspection: inspection.date,
+        status: _selectedHiveStatus,
+        nucleusStatus: _selectedNucleusStatus,
       );
-      await hiveProvider.updateHive(updatedHive);
+      await Provider.of<HiveProvider>(context, listen: false).updateHive(updatedHive);
     }
   }
 }

@@ -847,6 +847,84 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'حدث خطأ أثناء حفظ الفحص'**
   String get error_saving_inspection;
+
+  /// No description provided for @nucleus_status_title.
+  ///
+  /// In ar, this message translates to:
+  /// **'حالة الطرد'**
+  String get nucleus_status_title;
+
+  /// No description provided for @nucleus_status_mating.
+  ///
+  /// In ar, this message translates to:
+  /// **'قيد التلقيح'**
+  String get nucleus_status_mating;
+
+  /// No description provided for @nucleus_status_mated.
+  ///
+  /// In ar, this message translates to:
+  /// **'ملقحة'**
+  String get nucleus_status_mated;
+
+  /// No description provided for @nucleus_status_failed.
+  ///
+  /// In ar, this message translates to:
+  /// **'فاشلة'**
+  String get nucleus_status_failed;
+
+  /// No description provided for @nucleus_status_laying.
+  ///
+  /// In ar, this message translates to:
+  /// **'تضع البيض'**
+  String get nucleus_status_laying;
+
+  /// No description provided for @health_strong.
+  ///
+  /// In ar, this message translates to:
+  /// **'قوي'**
+  String get health_strong;
+
+  /// No description provided for @health_average.
+  ///
+  /// In ar, this message translates to:
+  /// **'متوسط'**
+  String get health_average;
+
+  /// No description provided for @health_weak.
+  ///
+  /// In ar, this message translates to:
+  /// **'ضعيف'**
+  String get health_weak;
+
+  /// No description provided for @brood_pattern_good.
+  ///
+  /// In ar, this message translates to:
+  /// **'جيد'**
+  String get brood_pattern_good;
+
+  /// No description provided for @brood_pattern_spotty.
+  ///
+  /// In ar, this message translates to:
+  /// **'متقطع'**
+  String get brood_pattern_spotty;
+
+  /// No description provided for @brood_pattern_poor.
+  ///
+  /// In ar, this message translates to:
+  /// **'ضعيف'**
+  String get brood_pattern_poor;
+
+  /// No description provided for @brood_pattern_none.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا يوجد'**
+  String get brood_pattern_none;
+
+  /// No description provided for @queen_presence_unseen.
+  ///
+  /// In ar, this message translates to:
+  /// **'لم يتم رؤيتها'**
+  String get queen_presence_unseen;
 }
 
 class _AppLocalizationsDelegate

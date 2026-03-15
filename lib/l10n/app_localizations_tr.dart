@@ -49,7 +49,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get hives => 'Kovanlar';
 
   @override
-  String get inspections => 'Denetimler';
+  String get inspections => 'Kontroller';
 
   @override
   String get treatments => 'Tedaviler';
@@ -79,7 +79,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get add_hive => 'Kovan Ekle';
 
   @override
-  String get add_inspection => 'Denetim Ekle';
+  String get add_inspection => 'Kontrol Ekle';
 
   @override
   String get add_treatment => 'Tedavi Ekle';
@@ -97,10 +97,10 @@ class AppLocalizationsTr extends AppLocalizations {
   String get frame_count => 'Çerçeve Sayısı';
 
   @override
-  String get honey_frames => 'Bal Çerçeveleri';
+  String get honey_frames => 'Ballı Çerçeveler';
 
   @override
-  String get brood_frames => 'Kuluçka Çerçeveleri';
+  String get brood_frames => 'Yavrulu Çerçeveler';
 
   @override
   String get save => 'Kaydet';
@@ -169,7 +169,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get active_treatments => 'Aktif Tedaviler';
 
   @override
-  String get pending_inspections => 'Bekleyen Denetimler';
+  String get pending_inspections => 'Bekleyen Kontroller';
 
   @override
   String get kg => 'kg';
@@ -247,7 +247,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get full_hive => 'Tam Kovan';
 
   @override
-  String get nucleus_hive => 'Rușet Kovan';
+  String get nucleus_hive => 'Ruçet Kovan';
 
   @override
   String get installation_date => 'Kurulum Tarihi';
@@ -307,7 +307,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get breed_local => 'Yerli';
 
   @override
-  String get breed_hybrid => 'Melez';
+  String get breed_hybrid => 'Hibrit';
 
   @override
   String get select_date => 'Tarih Seç';
@@ -346,13 +346,13 @@ class AppLocalizationsTr extends AppLocalizations {
   String get select_hive_placeholder => 'Bir kovan seçin';
 
   @override
-  String get inspection_date => 'Denetim Tarihi';
+  String get inspection_date => 'Kontrol Tarihi';
 
   @override
-  String get brood_status => 'Kuluçka Durumu';
+  String get brood_status => 'Yavru Durumu';
 
   @override
-  String get select_brood_status_placeholder => 'Kuluçka durumunu seçin';
+  String get select_brood_status_placeholder => 'Yavru durumunu seçin';
 
   @override
   String get environmental_data => 'Çevresel Veriler';
@@ -376,8 +376,47 @@ class AppLocalizationsTr extends AppLocalizations {
   String get error_select_hive => 'Lütfen önce bir kovan seçin';
 
   @override
-  String get inspection_saved_success => 'Denetim başarıyla kaydedildi';
+  String get inspection_saved_success => 'Kontrol başarıyla kaydedildi';
 
   @override
-  String get error_saving_inspection => 'Denetim kaydedilirken bir hata oluştu';
+  String get error_saving_inspection => 'Kontrol kaydedilirken bir hata oluştu';
+
+  @override
+  String get nucleus_status_title => 'Ruçet Durumu';
+
+  @override
+  String get nucleus_status_mating => 'Çiftleşiyor';
+
+  @override
+  String get nucleus_status_mated => 'Çiftleşti';
+
+  @override
+  String get nucleus_status_failed => 'Başarısız';
+
+  @override
+  String get nucleus_status_laying => 'Yumurtluyor';
+
+  @override
+  String get health_strong => 'Güçlü';
+
+  @override
+  String get health_average => 'Orta';
+
+  @override
+  String get health_weak => 'Zayıf';
+
+  @override
+  String get brood_pattern_good => 'İyi';
+
+  @override
+  String get brood_pattern_spotty => 'Düzensiz';
+
+  @override
+  String get brood_pattern_poor => 'Kötü';
+
+  @override
+  String get brood_pattern_none => 'Yok';
+
+  @override
+  String get queen_presence_unseen => 'Görülmedi';
 }

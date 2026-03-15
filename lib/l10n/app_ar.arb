@@ -123,5 +123,18 @@
   "notes_placeholder": "اكتب ملاحظاتك هنا...",
   "error_select_hive": "يرجى اختيار خلية أولاً",
   "inspection_saved_success": "تم حفظ الفحص بنجاح",
-  "error_saving_inspection": "حدث خطأ أثناء حفظ الفحص"
+  "error_saving_inspection": "حدث خطأ أثناء حفظ الفحص",
+  "nucleus_status_title": "حالة الطرد",
+  "nucleus_status_mating": "قيد التلقيح",
+  "nucleus_status_mated": "ملقحة",
+  "nucleus_status_failed": "فاشلة",
+  "nucleus_status_laying": "تضع البيض",
+  "health_strong": "قوي",
+  "health_average": "متوسط",
+  "health_weak": "ضعيف",
+  "brood_pattern_good": "جيد",
+  "brood_pattern_spotty": "متقطع",
+  "brood_pattern_poor": "ضعيف",
+  "brood_pattern_none": "لا يوجد",
+  "queen_presence_unseen": "لم يتم رؤيتها"
 }

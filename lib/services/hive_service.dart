@@ -28,8 +28,6 @@ class HiveService {
     ));
   }
 
-  // --- *** 1. الدالة الجديدة والمهمة التي تمت إضافتها *** ---
-  /// تجلب خلية واحدة محددة من قاعدة البيانات.
   Future<HiveModel?> getHiveById(String hiveId) async {
     try {
       final response = await _client
@@ -70,7 +68,8 @@ class HiveService {
         final filtered = data.where((map) =>
         map['user_id'] == userId &&
             map['parent_hive_id'] == parentHiveId &&
-            map['is_nucleus'] == true
+            // --- تم التصحيح هنا ---
+            (map['type'] == HiveType.nucleus.name || (map['type'] == null && map['is_nucleus'] == true))
         ).toList();
         final sorted = filtered..sort((a, b) =>
             (b['created_date'] as String).compareTo(a['created_date'] as String)
@@ -99,7 +98,8 @@ class HiveService {
           final hive = HiveModel.fromMap(map);
           totalHives++;
           if (hive.status == HiveStatus.active) activeHives++;
-          if (hive.isNucleus) {
+          // --- تم التصحيح هنا ---
+          if (hive.type == HiveType.nucleus) {
             nuclei++;
             if (hive.frameCount >= 5) readyForUpgrade++;
           } else {
@@ -107,7 +107,6 @@ class HiveService {
               readyForDivision++;
             }
           }
-          // if (hive.tags.contains('problem')) problemHives++;
         }
 
         sink.add({
@@ -158,9 +157,10 @@ class HiveService {
 
   Future<void> divideHive(String parentHiveId, HiveModel nucleus) async {
     try {
+      // --- تم التصحيح هنا ---
       await _client.rpc('divide_hive', params: {
         'p_parent_hive_id': parentHiveId,
-        'p_nucleus_data': nucleus.copyWith(parentHiveId: parentHiveId, isNucleus: true).toMap(),
+        'p_nucleus_data': nucleus.copyWith(parentHiveId: parentHiveId, type: HiveType.nucleus).toMap(),
       });
     } catch (e) {
       throw Exception('فشل في تقسيم الخلية: $e');
@@ -169,8 +169,9 @@ class HiveService {
 
   Future<void> upgradeNucleus(String nucleusId) async {
     try {
+      // --- تم التصحيح هنا ---
       await _client.from('hives').update({
-        'is_nucleus': false,
+        'type': HiveType.fullHive.name,
         'parent_hive_id': null,
         'custom_fields': {'upgradedAt': DateTime.now().toIso8601String()}
       }).eq('id', nucleusId);
@@ -181,11 +182,12 @@ class HiveService {
 
   Future<List<HiveModel>> getHivesForDivision(String userId) async {
     try {
+      // --- تم التصحيح هنا ---
       final response = await _client
           .from('hives')
           .select()
           .eq('user_id', userId)
-          .eq('is_nucleus', false)
+          .eq('type', HiveType.fullHive.name)
           .eq('status', HiveStatus.active.name)
           .gte('frame_count', 8);
 

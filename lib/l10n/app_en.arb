@@ -123,5 +123,18 @@
   "notes_placeholder": "Write your notes here...",
   "error_select_hive": "Please select a hive first",
   "inspection_saved_success": "Inspection saved successfully",
-  "error_saving_inspection": "An error occurred while saving the inspection"
+  "error_saving_inspection": "An error occurred while saving the inspection",
+  "nucleus_status_title": "Nucleus Status",
+  "nucleus_status_mating": "Mating",
+  "nucleus_status_mated": "Mated",
+  "nucleus_status_failed": "Failed",
+  "nucleus_status_laying": "Laying",
+  "health_strong": "Strong",
+  "health_average": "Average",
+  "health_weak": "Weak",
+  "brood_pattern_good": "Good",
+  "brood_pattern_spotty": "Spotty",
+  "brood_pattern_poor": "Poor",
+  "brood_pattern_none": "None",
+  "queen_presence_unseen": "Unseen"
 }

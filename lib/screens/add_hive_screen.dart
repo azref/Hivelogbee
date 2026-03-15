@@ -7,6 +7,8 @@ import '../utils/app_theme.dart';
 import '../services/ad_service.dart';
 import '../widgets/custom_app_bar.dart';
 import '../l10n/app_localizations.dart';
+// --- 1. استيراد الويدجت الجديد ---
+import '../widgets/hive_status_selector.dart';
 
 class AddHiveScreen extends StatefulWidget {
   const AddHiveScreen({super.key});
@@ -24,8 +26,9 @@ class _AddHiveScreenState extends State<AddHiveScreen> {
   final _pollenFramesController = TextEditingController(text: '0');
   final _emptyFramesController = TextEditingController(text: '0');
 
-  bool _isNucleus = false;
+  HiveType _selectedType = HiveType.fullHive;
   HiveStatus _selectedStatus = HiveStatus.active;
+  NucleusStatus? _selectedNucleusStatus;
   QueenStatus _selectedQueenStatus = QueenStatus.present;
   BeeBreed _selectedBreed = BeeBreed.local;
   DateTime _installationDate = DateTime.now();
@@ -35,6 +38,10 @@ class _AddHiveScreenState extends State<AddHiveScreen> {
   void initState() {
     super.initState();
     AdManager.onScreenChange(AdScreen.addHive, AdScreen.hiveList);
+    // ضبط الحالة الأولية بناءً على النوع الافتراضي
+    if (_selectedType == HiveType.nucleus) {
+      _selectedNucleusStatus = NucleusStatus.mating;
+    }
   }
 
   @override
@@ -48,17 +55,7 @@ class _AddHiveScreenState extends State<AddHiveScreen> {
     super.dispose();
   }
 
-  String _getTranslatedStatus(HiveStatus status, AppLocalizations l10n) {
-    switch (status) {
-      case HiveStatus.active: return l10n.status_active;
-      case HiveStatus.weak: return l10n.status_weak;
-      case HiveStatus.sick: return l10n.status_sick;
-      case HiveStatus.dead: return l10n.status_dead;
-      case HiveStatus.queenless: return l10n.status_queenless;
-      case HiveStatus.split: return l10n.status_split;
-      case HiveStatus.merged: return l10n.status_merged;
-    }
-  }
+  // --- 2. تم حذف دوال الترجمة الخاصة بالحالة لأنها الآن في الويدجت ---
 
   String _getTranslatedQueenStatus(QueenStatus status, AppLocalizations l10n) {
     switch (status) {
@@ -119,7 +116,6 @@ class _AddHiveScreenState extends State<AddHiveScreen> {
                           prefixIcon: const Icon(Icons.tag),
                           border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                           filled: true,
-                          // --- إصلاح: استخدام withAlpha بدلاً من withOpacity ---
                           fillColor: Colors.white.withAlpha(230),
                         ),
                         validator: (value) => (value == null || value.trim().isEmpty) ? l10n.error_enter_number : null,
@@ -136,34 +132,43 @@ class _AddHiveScreenState extends State<AddHiveScreen> {
                 const SizedBox(height: 24),
                 _buildSection(
                   title: l10n.hive_type,
-                  child: _buildDropdownField<bool>(
+                  child: _buildDropdownField<HiveType>(
                     label: l10n.hive_type,
-                    value: _isNucleus,
+                    value: _selectedType,
                     items: [
-                      DropdownMenuItem(value: false, child: Text(l10n.full_hive, style: const TextStyle(fontSize: 18))),
-                      DropdownMenuItem(value: true, child: Text(l10n.nucleus_hive, style: const TextStyle(fontSize: 18))),
+                      DropdownMenuItem(value: HiveType.fullHive, child: Text('خلية', style: const TextStyle(fontSize: 18))),
+                      DropdownMenuItem(value: HiveType.nucleus, child: Text('طرد', style: const TextStyle(fontSize: 18))),
                     ],
                     onChanged: (value) {
+                      if (value == null) return;
                       setState(() {
-                        _isNucleus = value!;
+                        _selectedType = value;
+                        if (_selectedType == HiveType.fullHive) {
+                          _selectedNucleusStatus = null;
+                          _selectedStatus = HiveStatus.active;
+                        } else {
+                          _selectedNucleusStatus = NucleusStatus.mating;
+                          _selectedStatus = HiveStatus.active;
+                        }
                       });
                     },
                   ),
                 ),
                 const SizedBox(height: 24),
-                _buildSection(
-                  title: l10n.hive_status,
-                  child: _buildDropdownField<HiveStatus>(
-                    label: l10n.hive_status,
-                    value: _selectedStatus,
-                    items: HiveStatus.values.map((status) {
-                      return DropdownMenuItem(
-                        value: status,
-                        child: Text(_getTranslatedStatus(status, l10n), style: const TextStyle(fontSize: 18)),
-                      );
-                    }).toList(),
-                    onChanged: (value) => setState(() => _selectedStatus = value!),
-                  ),
+                // --- 3. استخدام الويدجت الجديد بدلاً من الكود المكرر ---
+                HiveStatusSelector(
+                  selectedType: _selectedType,
+                  hiveStatus: _selectedStatus,
+                  nucleusStatus: _selectedNucleusStatus,
+                  onChanged: (newValue) {
+                    setState(() {
+                      if (newValue is HiveStatus) {
+                        _selectedStatus = newValue;
+                      } else if (newValue is NucleusStatus) {
+                        _selectedNucleusStatus = newValue;
+                      }
+                    });
+                  },
                 ),
                 const SizedBox(height: 24),
                 _buildSection(
@@ -179,7 +184,11 @@ class _AddHiveScreenState extends State<AddHiveScreen> {
                             child: Text(_getTranslatedQueenStatus(status, l10n), style: const TextStyle(fontSize: 18)),
                           );
                         }).toList(),
-                        onChanged: (value) => setState(() => _selectedQueenStatus = value!),
+                        onChanged: (value) {
+                          if (value != null) {
+                            setState(() => _selectedQueenStatus = value);
+                          }
+                        },
                       ),
                       const SizedBox(height: 16),
                       _buildDropdownField<BeeBreed>(
@@ -191,7 +200,11 @@ class _AddHiveScreenState extends State<AddHiveScreen> {
                             child: Text(_getTranslatedBreed(breed, l10n), style: const TextStyle(fontSize: 18)),
                           );
                         }).toList(),
-                        onChanged: (value) => setState(() => _selectedBreed = value!),
+                        onChanged: (value) {
+                          if (value != null) {
+                            setState(() => _selectedBreed = value);
+                          }
+                        },
                       ),
                     ],
                   ),
@@ -231,7 +244,6 @@ class _AddHiveScreenState extends State<AddHiveScreen> {
                       labelStyle: const TextStyle(fontSize: 18),
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                       filled: true,
-                      // --- إصلاح: استخدام withAlpha بدلاً من withOpacity ---
                       fillColor: Colors.white.withAlpha(230),
                     ),
                   ),
@@ -250,9 +262,7 @@ class _AddHiveScreenState extends State<AddHiveScreen> {
   Widget _buildSection({required String title, required Widget child}) {
     return Card(
       elevation: 8,
-      // --- إصلاح: استخدام withAlpha بدلاً من withOpacity ---
       shadowColor: Colors.black.withAlpha(128),
-      // --- إصلاح: استخدام withAlpha بدلاً من withOpacity ---
       color: Colors.white.withAlpha(217),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
@@ -281,7 +291,6 @@ class _AddHiveScreenState extends State<AddHiveScreen> {
         prefixIcon: Icon(icon, size: 24),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
         filled: true,
-        // --- إصلاح: استخدام withAlpha بدلاً من withOpacity ---
         fillColor: Colors.white.withAlpha(230),
       ),
       validator: (value) {
@@ -300,7 +309,6 @@ class _AddHiveScreenState extends State<AddHiveScreen> {
         labelStyle: const TextStyle(fontSize: 18),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
         filled: true,
-        // --- إصلاح: استخدام withAlpha بدلاً من withOpacity ---
         fillColor: Colors.white.withAlpha(230),
       ),
       style: const TextStyle(fontSize: 18, color: Colors.black),
@@ -318,7 +326,6 @@ class _AddHiveScreenState extends State<AddHiveScreen> {
         decoration: BoxDecoration(
             border: Border.all(color: Colors.grey.shade500),
             borderRadius: BorderRadius.circular(12),
-            // --- إصلاح: استخدام withAlpha بدلاً من withOpacity ---
             color: Colors.white.withAlpha(230)
         ),
         child: Row(
@@ -343,7 +350,6 @@ class _AddHiveScreenState extends State<AddHiveScreen> {
             foregroundColor: AppTheme.darkBrown,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             elevation: 8,
-            // --- إصلاح: استخدام withAlpha بدلاً من withOpacity ---
             shadowColor: Colors.black.withAlpha(102)
         ),
         child: _isLoading
@@ -382,7 +388,9 @@ class _AddHiveScreenState extends State<AddHiveScreen> {
         hiveNumber: _numberController.text.trim(),
         breed: _selectedBreed,
         createdDate: _installationDate,
+        type: _selectedType,
         status: _selectedStatus,
+        nucleusStatus: _selectedNucleusStatus,
         queenStatus: _selectedQueenStatus,
         frameCount: totalFrames,
         broodFrames: broodFrames,
@@ -392,7 +400,6 @@ class _AddHiveScreenState extends State<AddHiveScreen> {
         notes: _notesController.text.trim(),
         location: null,
         lastInspection: _installationDate,
-        isNucleus: _isNucleus,
       );
 
       await Provider.of<HiveProvider>(context, listen: false).addHive(newHive);

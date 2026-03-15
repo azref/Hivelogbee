@@ -123,5 +123,18 @@
   "notes_placeholder": "Escriba sus notas aquí...",
   "error_select_hive": "Por favor, seleccione una colmena primero",
   "inspection_saved_success": "Inspección guardada con éxito",
-  "error_saving_inspection": "Ocurrió un error al guardar la inspección"
+  "error_saving_inspection": "Ocurrió un error al guardar la inspección",
+  "nucleus_status_title": "Estado del Núcleo",
+  "nucleus_status_mating": "En Fecundación",
+  "nucleus_status_mated": "Fecundada",
+  "nucleus_status_failed": "Fallida",
+  "nucleus_status_laying": "Poniendo Huevos",
+  "health_strong": "Fuerte",
+  "health_average": "Promedio",
+  "health_weak": "Débil",
+  "brood_pattern_good": "Bueno",
+  "brood_pattern_spotty": "Irregular",
+  "brood_pattern_poor": "Pobre",
+  "brood_pattern_none": "Ninguno",
+  "queen_presence_unseen": "No Vista"
 }

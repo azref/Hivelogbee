@@ -41,7 +41,6 @@ class _HiveListScreenState extends State<HiveListScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    // --- 1. الاستماع لكل من HiveProvider و InspectionProvider ---
     return Consumer2<HiveProvider, InspectionProvider>(
       builder: (context, hiveProvider, inspectionProvider, child) {
         final hives = hiveProvider.getFilteredHives(widget.filter);
@@ -109,7 +108,6 @@ class _HiveListScreenState extends State<HiveListScreen> {
         itemCount: hives.length,
         itemBuilder: (context, index) {
           final hive = hives[index];
-          // --- 2. جلب آخر فحص للخلية ---
           final hiveInspections = inspectionProvider.getInspectionsByHive(hive.id);
           final InspectionModel? latestInspection = hiveInspections.isNotEmpty ? hiveInspections.first : null;
 
@@ -119,11 +117,10 @@ class _HiveListScreenState extends State<HiveListScreen> {
     );
   }
 
-  // --- 3. تعديل دالة بناء البطاقة لاستقبال آخر فحص ---
   Widget _buildHiveCard(BuildContext context, HiveModel hive, InspectionModel? latestInspection, AppLocalizations l10n) {
-    final statusColor = _getStatusColor(hive.status);
+    // --- 1. تعديل: استخدام دالة اللون الجديدة ---
+    final statusColor = _getStatusColor(hive.type, hive.status, hive.nucleusStatus);
 
-    // --- 4. استخدام بيانات آخر فحص إذا كان متاحاً ---
     final frameCount = latestInspection != null
         ? latestInspection.broodFrames +
         latestInspection.honeyFrames +
@@ -146,6 +143,7 @@ class _HiveListScreenState extends State<HiveListScreen> {
       margin: const EdgeInsets.only(bottom: 16),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: InkWell(
+        // --- 2. تعديل: استخدام getter 'isNucleus' للتوافقية ---
         onTap: () => widget.onHiveTap(hive.id, hive.hiveNumber, hive.isNucleus),
         borderRadius: BorderRadius.circular(16),
         child: IntrinsicHeight(
@@ -170,14 +168,16 @@ class _HiveListScreenState extends State<HiveListScreen> {
                       Row(
                         children: [
                           Icon(
-                            hive.isNucleus ? Icons.egg_outlined : Icons.hive_outlined,
+                            // --- 3. تعديل: استخدام hive.type لتحديد الأيقونة ---
+                            hive.type == HiveType.nucleus ? Icons.egg_outlined : Icons.hive_outlined,
                             color: AppTheme.darkBrown,
                             size: 28,
                           ),
                           const SizedBox(width: 12),
                           Expanded(
                             child: Text(
-                              '${hive.isNucleus ? 'طرد' : 'خلية'} رقم: ${hive.hiveNumber}',
+                              // --- 4. تعديل: استخدام typeDisplayName ---
+                              '${hive.typeDisplayName} رقم: ${hive.hiveNumber}',
                               style: const TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
@@ -193,6 +193,7 @@ class _HiveListScreenState extends State<HiveListScreen> {
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Text(
+                              // --- 5. تعديل: statusDisplayName أصبحت ذكية الآن ---
                               hive.statusDisplayName,
                               style: TextStyle(
                                 color: statusColor,
@@ -295,7 +296,19 @@ class _HiveListScreenState extends State<HiveListScreen> {
     );
   }
 
-  Color _getStatusColor(HiveStatus status) {
+  // --- 6. تعديل: دالة اللون لتكون أكثر شمولاً ---
+  Color _getStatusColor(HiveType type, HiveStatus status, NucleusStatus? nucleusStatus) {
+    if (type == HiveType.nucleus && nucleusStatus != null) {
+      switch (nucleusStatus) {
+        case NucleusStatus.mated:
+        case NucleusStatus.laying:
+          return AppTheme.successColor;
+        case NucleusStatus.mating:
+          return AppTheme.primaryYellow;
+        case NucleusStatus.failed:
+          return AppTheme.errorColor;
+      }
+    }
     switch (status) {
       case HiveStatus.active: return AppTheme.successColor;
       case HiveStatus.weak: return Colors.orange;
@@ -306,7 +319,6 @@ class _HiveListScreenState extends State<HiveListScreen> {
     }
   }
 
-  // --- 5. دالة مساعدة لترجمة حالة الملكة ---
   String _getTranslatedQueenPresence(QueenPresence status, AppLocalizations l10n) {
     switch (status) {
       case QueenPresence.present: return "موجودة";

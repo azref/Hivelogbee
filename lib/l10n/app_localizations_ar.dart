@@ -379,4 +379,43 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get error_saving_inspection => 'حدث خطأ أثناء حفظ الفحص';
+
+  @override
+  String get nucleus_status_title => 'حالة الطرد';
+
+  @override
+  String get nucleus_status_mating => 'قيد التلقيح';
+
+  @override
+  String get nucleus_status_mated => 'ملقحة';
+
+  @override
+  String get nucleus_status_failed => 'فاشلة';
+
+  @override
+  String get nucleus_status_laying => 'تضع البيض';
+
+  @override
+  String get health_strong => 'قوي';
+
+  @override
+  String get health_average => 'متوسط';
+
+  @override
+  String get health_weak => 'ضعيف';
+
+  @override
+  String get brood_pattern_good => 'جيد';
+
+  @override
+  String get brood_pattern_spotty => 'متقطع';
+
+  @override
+  String get brood_pattern_poor => 'ضعيف';
+
+  @override
+  String get brood_pattern_none => 'لا يوجد';
+
+  @override
+  String get queen_presence_unseen => 'لم يتم رؤيتها';
 }

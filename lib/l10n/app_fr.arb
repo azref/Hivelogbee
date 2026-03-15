@@ -123,5 +123,18 @@
   "notes_placeholder": "Écrivez vos notes ici...",
   "error_select_hive": "Veuillez d'abord sélectionner une ruche",
   "inspection_saved_success": "Inspection enregistrée avec succès",
-  "error_saving_inspection": "Une erreur est survenue lors de l'enregistrement de l'inspection"
+  "error_saving_inspection": "Une erreur est survenue lors de l'enregistrement de l'inspection",
+  "nucleus_status_title": "Statut du Nucléus",
+  "nucleus_status_mating": "En fécondation",
+  "nucleus_status_mated": "Fécondée",
+  "nucleus_status_failed": "Échec",
+  "nucleus_status_laying": "En ponte",
+  "health_strong": "Fort",
+  "health_average": "Moyen",
+  "health_weak": "Faible",
+  "brood_pattern_good": "Bon",
+  "brood_pattern_spotty": "Irrégulier",
+  "brood_pattern_poor": "Pauvre",
+  "brood_pattern_none": "Aucun",
+  "queen_presence_unseen": "Non vue"
 }

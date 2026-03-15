@@ -383,4 +383,43 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get error_saving_inspection =>
       'Ocurrió un error al guardar la inspección';
+
+  @override
+  String get nucleus_status_title => 'Estado del Núcleo';
+
+  @override
+  String get nucleus_status_mating => 'En Fecundación';
+
+  @override
+  String get nucleus_status_mated => 'Fecundada';
+
+  @override
+  String get nucleus_status_failed => 'Fallida';
+
+  @override
+  String get nucleus_status_laying => 'Poniendo Huevos';
+
+  @override
+  String get health_strong => 'Fuerte';
+
+  @override
+  String get health_average => 'Promedio';
+
+  @override
+  String get health_weak => 'Débil';
+
+  @override
+  String get brood_pattern_good => 'Bueno';
+
+  @override
+  String get brood_pattern_spotty => 'Irregular';
+
+  @override
+  String get brood_pattern_poor => 'Pobre';
+
+  @override
+  String get brood_pattern_none => 'Ninguno';
+
+  @override
+  String get queen_presence_unseen => 'No Vista';
 }
